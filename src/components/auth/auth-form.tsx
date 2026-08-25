@@ -36,6 +36,16 @@ export function AuthForm({ mode }: { mode: "login" | "signup" }) {
     if (status === "authenticated") router.replace("/dashboard");
   }, [status, router]);
 
+  // Surface an auth error passed back by the /auth/callback route.
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const err = new URLSearchParams(window.location.search).get("error");
+    if (err) {
+      toast.error(`Error de inicio de sesión: ${decodeURIComponent(err)}`);
+      window.history.replaceState({}, "", window.location.pathname);
+    }
+  }, []);
+
   // Local mode: no cloud accounts. Offer a clear, honest entry point.
   if (isLocalMode) {
     return (
@@ -68,7 +78,14 @@ export function AuthForm({ mode }: { mode: "login" | "signup" }) {
   return (
     <Card>
       <CardContent className="flex flex-col gap-4 py-6">
-        <Button variant="outline" className="w-full gap-2" onClick={() => signInWithGoogle()}>
+        <Button
+          variant="outline"
+          className="w-full gap-2"
+          onClick={async () => {
+            const { error } = await signInWithGoogle();
+            if (error) toast.error(error);
+          }}
+        >
           <GoogleIcon /> {t("auth.continueGoogle")}
         </Button>
         <div className="flex items-center gap-3">

@@ -127,8 +127,10 @@ export function SessionProvider({ children }: { children: ReactNode }) {
       async signInWithGoogle() {
         const supabase = getSupabaseBrowser();
         if (!supabase) return { error: "Cloud auth is not configured." };
+        // Keep the redirect URL query-free so it matches Supabase's allow-list
+        // exactly; the callback route defaults to /dashboard.
         const redirectTo =
-          typeof window !== "undefined" ? `${window.location.origin}/auth/callback?next=/dashboard` : undefined;
+          typeof window !== "undefined" ? `${window.location.origin}/auth/callback` : undefined;
         const { error } = await supabase.auth.signInWithOAuth({ provider: "google", options: { redirectTo } });
         return { error: error?.message ?? null };
       },
