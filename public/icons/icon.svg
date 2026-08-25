@@ -1,0 +1,19 @@
+<svg width="512" height="512" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="LifeOS">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#1b2333"/>
+      <stop offset="1" stop-color="#0b0e14"/>
+    </linearGradient>
+    <linearGradient id="mark" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#5b8bff"/>
+      <stop offset="1" stop-color="#8b5bff"/>
+    </linearGradient>
+  </defs>
+  <rect width="512" height="512" rx="112" fill="url(#bg)"/>
+  <!-- upward growth arc + node, kept within the maskable safe zone -->
+  <path d="M150 340 C 190 250, 250 250, 290 210 S 360 150, 372 150"
+        fill="none" stroke="url(#mark)" stroke-width="30" stroke-linecap="round"/>
+  <circle cx="372" cy="150" r="26" fill="#8b5bff"/>
+  <circle cx="150" cy="340" r="22" fill="#5b8bff"/>
+  <rect x="150" y="352" width="212" height="20" rx="10" fill="#5b8bff" opacity="0.35"/>
+</svg>
