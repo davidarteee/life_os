@@ -15,26 +15,19 @@
 -- ===========================================================================
 
 -- Helper: apply the identical owner-scoped policy set to a table. -------------
+-- Idempotent: drops each policy first so the migration is safe to re-run.
 create or replace function lifeos_apply_rls(tbl regclass) returns void as $$
 declare t text := tbl::text;
 begin
   execute format('alter table %s enable row level security;', t);
-  execute format($p$
-    create policy "select_own" on %s for select
-      using (auth.uid() = user_id);
-  $p$, t);
-  execute format($p$
-    create policy "insert_own" on %s for insert
-      with check (auth.uid() = user_id);
-  $p$, t);
-  execute format($p$
-    create policy "update_own" on %s for update
-      using (auth.uid() = user_id) with check (auth.uid() = user_id);
-  $p$, t);
-  execute format($p$
-    create policy "delete_own" on %s for delete
-      using (auth.uid() = user_id);
-  $p$, t);
+  execute format('drop policy if exists "select_own" on %s;', t);
+  execute format('create policy "select_own" on %s for select using (auth.uid() = user_id);', t);
+  execute format('drop policy if exists "insert_own" on %s;', t);
+  execute format('create policy "insert_own" on %s for insert with check (auth.uid() = user_id);', t);
+  execute format('drop policy if exists "update_own" on %s;', t);
+  execute format('create policy "update_own" on %s for update using (auth.uid() = user_id) with check (auth.uid() = user_id);', t);
+  execute format('drop policy if exists "delete_own" on %s;', t);
+  execute format('create policy "delete_own" on %s for delete using (auth.uid() = user_id);', t);
 end;
 $$ language plpgsql;
 
@@ -84,7 +77,7 @@ begin
     'shop_purchases','user_achievements','challenges','user_settings'
   ] loop
     execute format(
-      'create trigger %I before update on public.%I for each row execute function lifeos_touch_updated_at();',
+      'create or replace trigger %I before update on public.%I for each row execute function lifeos_touch_updated_at();',
       t || '_touch', t
     );
   end loop;
@@ -98,11 +91,15 @@ insert into storage.buckets (id, name, public)
 values ('lifeos', 'lifeos', false)
 on conflict (id) do nothing;
 
+drop policy if exists "lifeos_read_own" on storage.objects;
 create policy "lifeos_read_own" on storage.objects for select
   using (bucket_id = 'lifeos' and (storage.foldername(name))[1] = auth.uid()::text);
+drop policy if exists "lifeos_write_own" on storage.objects;
 create policy "lifeos_write_own" on storage.objects for insert
   with check (bucket_id = 'lifeos' and (storage.foldername(name))[1] = auth.uid()::text);
+drop policy if exists "lifeos_update_own" on storage.objects;
 create policy "lifeos_update_own" on storage.objects for update
   using (bucket_id = 'lifeos' and (storage.foldername(name))[1] = auth.uid()::text);
+drop policy if exists "lifeos_delete_own" on storage.objects;
 create policy "lifeos_delete_own" on storage.objects for delete
   using (bucket_id = 'lifeos' and (storage.foldername(name))[1] = auth.uid()::text);
