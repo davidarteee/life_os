@@ -45,7 +45,7 @@ export function NavList({ onNavigate }: NavListProps) {
                 <span className="truncate">{t(item.labelKey)}</span>
                 {!item.ready && (
                   <span className="ml-auto rounded-full bg-muted px-1.5 py-0.5 text-[9px] font-medium text-muted-foreground/80">
-                    soon
+                    {t("nav.soon")}
                   </span>
                 )}
               </Link>

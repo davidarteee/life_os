@@ -8,14 +8,16 @@ import { AppHeader } from "@/components/layout/app-header";
 import { MobileNav } from "@/components/layout/mobile-nav";
 import { ChallengeWatcher } from "@/components/game/challenge-watcher";
 import { Brand } from "@/components/layout/brand";
+import { useT } from "@/hooks/use-t";
 
 /** Full-screen splash while the session resolves. */
 function Splash() {
+  const { t } = useT();
   return (
     <div className="grid min-h-dvh place-items-center bg-background">
       <div className="flex animate-pulse flex-col items-center gap-3">
         <Brand />
-        <p className="text-sm text-muted-foreground">Loading your world…</p>
+        <p className="text-sm text-muted-foreground">{t("offline.loadingWorld")}</p>
       </div>
     </div>
   );

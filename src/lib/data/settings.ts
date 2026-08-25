@@ -12,7 +12,7 @@ const settingsOpts = (userId: string) => ({
 export function defaultSettings(userId: string): UserSettings {
   return makeRecord<UserSettings>(userId, {
     id: `settings-${userId}`,
-    locale: "en",
+    locale: "es",
     currency: "EUR",
     heroMode: "auto",
     game: structuredClone(DEFAULT_GAME_CONFIG),

@@ -72,7 +72,7 @@ export function HabitRow({ item, day, onEdit }: HabitRowProps) {
       <button
         onClick={() => toggle(habit)}
         aria-pressed={completed}
-        aria-label={`${completed ? "Undo" : "Complete"} ${habit.name}`}
+        aria-label={`${completed ? t("habits.undo") : t("habits.complete")} ${habit.name}`}
         className={cn(
           "grid size-8 shrink-0 place-items-center rounded-full border-2 transition-all active:scale-90",
           completed ? cn(a.bg, "border-transparent text-white") : cn("border-border text-transparent hover:border-primary"),

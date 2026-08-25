@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { Play, Pause, RotateCcw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ProgressRing } from "@/components/habits/progress-ring";
+import { useT } from "@/hooks/use-t";
 import { cn } from "@/lib/utils";
 
 const FOCUS = 25 * 60;
@@ -11,6 +12,7 @@ const BREAK = 5 * 60;
 
 /** A real 25/5 Pomodoro timer. (Session logging to Study is a roadmap hook.) */
 export function PomodoroWidget() {
+  const { t } = useT();
   const [mode, setMode] = useState<"focus" | "break">("focus");
   const [remaining, setRemaining] = useState(FOCUS);
   const [running, setRunning] = useState(false);
@@ -48,9 +50,9 @@ export function PomodoroWidget() {
           <button
             key={m}
             onClick={() => { setMode(m); setRunning(false); setRemaining(m === "focus" ? FOCUS : BREAK); }}
-            className={cn("rounded-full px-3 py-1 capitalize transition-colors", mode === m ? "bg-primary text-primary-foreground" : "text-muted-foreground")}
+            className={cn("rounded-full px-3 py-1 transition-colors", mode === m ? "bg-primary text-primary-foreground" : "text-muted-foreground")}
           >
-            {m}
+            {m === "focus" ? t("widgets.focus") : t("widgets.break")}
           </button>
         ))}
       </div>

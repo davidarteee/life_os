@@ -7,6 +7,7 @@ import { useSession } from "@/components/providers/session-provider";
 import { useGameConfig } from "@/hooks/use-game";
 import { addChallengeEvidence, submitChallenge, verifyChallenge, updateChallenge } from "@/lib/data/game";
 import { compressImage } from "@/lib/image";
+import { describeChallenge } from "@/lib/i18n/content";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
@@ -17,7 +18,7 @@ import { toast } from "sonner";
 export function ChallengePanel({ challenge }: { challenge: Challenge }) {
   const { user } = useSession();
   const config = useGameConfig();
-  const { t } = useT();
+  const { t, locale } = useT();
   const fileRef = useRef<HTMLInputElement>(null);
   const [linkValue, setLinkValue] = useState("");
   const [notes, setNotes] = useState(challenge.notes ?? "");
@@ -25,6 +26,7 @@ export function ChallengePanel({ challenge }: { challenge: Challenge }) {
 
   if (!user) return null;
   const uid = user.id;
+  const info = describeChallenge(locale, challenge.defId);
   const hasEvidence = challenge.evidence.length > 0 || notes.trim().length > 0;
 
   async function onFiles(files: FileList | null) {
@@ -74,17 +76,17 @@ export function ChallengePanel({ challenge }: { challenge: Challenge }) {
         <div>
           <div className="flex items-center gap-2">
             <Trophy className="size-4 text-life" />
-            <h3 className="font-heading text-lg font-semibold">{challenge.title}</h3>
+            <h3 className="font-heading text-lg font-semibold">{info.title}</h3>
           </div>
-          <p className="mt-1 text-sm text-muted-foreground">{challenge.description}</p>
+          <p className="mt-1 text-sm text-muted-foreground">{info.description}</p>
         </div>
-        <Badge variant={challenge.status === "submitted" ? "secondary" : "outline"} className="shrink-0 capitalize">
-          {challenge.status === "submitted" ? t("challenge.pending") : challenge.status}
+        <Badge variant={challenge.status === "submitted" ? "secondary" : "outline"} className="shrink-0">
+          {challenge.status === "submitted" ? t("challenge.pending") : t(`challenge.status.${challenge.status}` as const)}
         </Badge>
       </div>
 
       <p className="text-xs font-medium text-muted-foreground">
-        {t("challenge.explainVerify")} · <span className="text-foreground/80">{challenge.metricLabel}</span>
+        {t("challenge.explainVerify")} · <span className="text-foreground/80">{info.metricLabel}</span>
       </p>
 
       {/* Evidence gallery */}

@@ -75,3 +75,14 @@ export function levelTitle(level: number): string {
   if (level >= 5) return "Apprentice";
   return "Novice";
 }
+
+/** i18n key for the level title, so the UI can render it in the active locale. */
+export function levelTitleKey(level: number): string {
+  if (level >= 100) return "title.ascended";
+  if (level >= 50) return "title.legend";
+  if (level >= 30) return "title.master";
+  if (level >= 20) return "title.veteran";
+  if (level >= 10) return "title.adept";
+  if (level >= 5) return "title.apprentice";
+  return "title.novice";
+}

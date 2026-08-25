@@ -7,17 +7,19 @@ import {
 import { ACHIEVEMENTS, type AchievementDefEx } from "@/lib/game/achievements-def";
 import type { AchievementRarity } from "@/lib/types";
 import { useUserAchievements } from "@/hooks/use-game";
+import { describeAchievement } from "@/lib/i18n/content";
+import { useT } from "@/hooks/use-t";
 import { cn } from "@/lib/utils";
 
 const ICONS: Record<string, LucideIcon> = {
   CircleCheckBig, Flame, Sparkles, TrendingUp, Zap, Trophy, Bird, ShieldCheck,
 };
 
-const RARITY: Record<AchievementRarity, { ring: string; text: string; bg: string; label: string }> = {
-  common: { ring: "ring-muted-foreground/20", text: "text-muted-foreground", bg: "bg-muted", label: "Common" },
-  rare: { ring: "ring-info/40", text: "text-info", bg: "bg-info/10", label: "Rare" },
-  epic: { ring: "ring-goals/40", text: "text-goals", bg: "bg-goals/10", label: "Epic" },
-  legendary: { ring: "ring-gold/50", text: "text-gold", bg: "bg-gold/10", label: "Legendary" },
+const RARITY: Record<AchievementRarity, { ring: string; text: string; bg: string }> = {
+  common: { ring: "ring-muted-foreground/20", text: "text-muted-foreground", bg: "bg-muted" },
+  rare: { ring: "ring-info/40", text: "text-info", bg: "bg-info/10" },
+  epic: { ring: "ring-goals/40", text: "text-goals", bg: "bg-goals/10" },
+  legendary: { ring: "ring-gold/50", text: "text-gold", bg: "bg-gold/10" },
 };
 
 interface AchievementsGridProps {
@@ -27,6 +29,7 @@ interface AchievementsGridProps {
 
 export function AchievementsGrid({ limit, unlockedFirst = true }: AchievementsGridProps) {
   const userAch = useUserAchievements();
+  const { t, locale } = useT();
   const byId = new Map(userAch.map((u) => [u.achievementId, u]));
 
   let defs: AchievementDefEx[] = [...ACHIEVEMENTS];
@@ -45,6 +48,7 @@ export function AchievementsGrid({ limit, unlockedFirst = true }: AchievementsGr
         const rarity = RARITY[def.rarity];
         const isHidden = def.hidden && !unlocked;
         const Icon = isHidden ? HelpCircle : ICONS[def.icon] ?? Trophy;
+        const text = describeAchievement(locale, def);
 
         return (
           <div
@@ -61,12 +65,12 @@ export function AchievementsGrid({ limit, unlockedFirst = true }: AchievementsGr
             <div className="min-w-0 flex-1">
               <div className="flex items-center gap-1.5">
                 <p className={cn("truncate text-sm font-semibold", !unlocked && "text-muted-foreground")}>
-                  {isHidden ? "Hidden achievement" : def.title}
+                  {isHidden ? t("game.hidden") : text.title}
                 </p>
                 {!unlocked && !isHidden && <Lock className="size-3 shrink-0 text-muted-foreground/50" />}
               </div>
               <p className="mt-0.5 line-clamp-2 text-xs text-muted-foreground">
-                {isHidden ? "Keep going to reveal this one." : def.description}
+                {isHidden ? t("achievements.hiddenReveal") : text.description}
               </p>
               {!isHidden && goal > 1 && (
                 <div className="mt-2">
@@ -77,7 +81,7 @@ export function AchievementsGrid({ limit, unlockedFirst = true }: AchievementsGr
                 </div>
               )}
               <div className="mt-1.5 flex items-center gap-2">
-                <span className={cn("text-[10px] font-medium", rarity.text)}>{rarity.label}</span>
+                <span className={cn("text-[10px] font-medium", rarity.text)}>{t(`rarity.${def.rarity}` as const)}</span>
                 <span className="text-[10px] text-muted-foreground">+{def.xpReward} XP</span>
               </div>
             </div>

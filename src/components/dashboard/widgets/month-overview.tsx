@@ -5,13 +5,13 @@ import { useUserId } from "@/components/providers/session-provider";
 import { allLogs } from "@/lib/data/habits";
 import { startOfMonth, endOfMonth, dayKey, weekdayIndex } from "@/lib/date";
 import { WEEKDAY_KEYS } from "@/lib/date";
-import { useLocaleStore } from "@/stores/locale-store";
+import { useT } from "@/hooks/use-t";
 import { cn } from "@/lib/utils";
 
 /** Mini month calendar; day intensity reflects habit completions that day. */
 export function MonthOverviewWidget() {
   const uid = useUserId();
-  const locale = useLocaleStore((s) => s.locale);
+  const { t, locale } = useT();
 
   const counts = useLiveQuery(async () => {
     if (!uid) return new Map<string, number>();
@@ -32,11 +32,11 @@ export function MonthOverviewWidget() {
 
   return (
     <div>
-      <p className="mb-2 font-heading text-sm font-semibold capitalize">
+      <p className="mb-2 font-heading text-sm font-semibold first-letter:uppercase">
         {start.toLocaleDateString(locale, { month: "long", year: "numeric" })}
       </p>
       <div className="mb-1 grid grid-cols-7 gap-1 text-center text-[9px] uppercase text-muted-foreground/60">
-        {WEEKDAY_KEYS.map((w) => <span key={w}>{w[0]}</span>)}
+        {WEEKDAY_KEYS.map((w) => <span key={w}>{t(`weekday.${w}` as const).charAt(0)}</span>)}
       </div>
       <div className="grid grid-cols-7 gap-1">
         {cells.map((c, i) => {

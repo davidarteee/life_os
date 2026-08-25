@@ -38,7 +38,7 @@ export function TodayHabits({ manage = false, addButton = true, limit }: TodayHa
         <div className="flex-1">
           <p className="font-heading text-sm font-semibold">{t("habits.today")}</p>
           <p className="text-xs text-muted-foreground">
-            {total === 0 ? t("habits.empty") : done === total ? t("habits.allDone") : `${total - done} left`}
+            {total === 0 ? t("habits.empty") : done === total ? t("habits.allDone") : t("habits.left", { n: total - done })}
           </p>
         </div>
         {manage && addButton && (
@@ -65,7 +65,7 @@ export function TodayHabits({ manage = false, addButton = true, limit }: TodayHa
           ))
         )}
         {limit && items.length > limit && (
-          <p className="pt-1 text-center text-xs text-muted-foreground">+{items.length - limit} more</p>
+          <p className="pt-1 text-center text-xs text-muted-foreground">+{t("common.more", { n: items.length - limit })}</p>
         )}
       </div>
 

@@ -4,8 +4,9 @@ import { Heart, Shield, Wallet } from "lucide-react";
 import { useGameState, useGameConfig } from "@/hooks/use-game";
 import { XpBar } from "@/components/game/xp-bar";
 import { LivesDisplay } from "@/components/game/lives-display";
-import { levelTitle } from "@/lib/game/xp";
+import { levelTitleKey } from "@/lib/game/xp";
 import { useT } from "@/hooks/use-t";
+import type { DictKey } from "@/lib/i18n";
 import { cn } from "@/lib/utils";
 
 /** Level + XP + lives summary. `hero` renders the large profile banner. */
@@ -24,7 +25,7 @@ export function GameStatusCard({ hero = false }: { hero?: boolean }) {
           {progress.level}
         </div>
         <div className="min-w-0 flex-1">
-          <p className={cn("font-heading font-semibold", hero ? "text-lg" : "text-sm")}>{levelTitle(progress.level)}</p>
+          <p className={cn("font-heading font-semibold", hero ? "text-lg" : "text-sm")}>{t(levelTitleKey(progress.level) as DictKey)}</p>
           <XpBar progress={progress} showTitle={false} compact={!hero} />
         </div>
       </div>
@@ -39,7 +40,7 @@ export function GameStatusCard({ hero = false }: { hero?: boolean }) {
           <span className="font-heading text-sm font-bold tabular-nums">{state.spendableXp}</span>
         </div>
         <div className="flex flex-col items-center gap-1 rounded-xl border border-border/60 bg-card/60 py-2.5">
-          <span className="flex items-center gap-1 text-[11px] text-muted-foreground"><Shield className="size-3 text-info" /> Shields</span>
+          <span className="flex items-center gap-1 text-[11px] text-muted-foreground"><Shield className="size-3 text-info" /> {t("game.shields")}</span>
           <span className="font-heading text-sm font-bold tabular-nums">{state.streakShields}</span>
         </div>
       </div>

@@ -46,7 +46,7 @@ export function UserMenu() {
           <>
             <DropdownMenuSeparator />
             <DropdownMenuItem onClick={() => signOut()} variant="destructive">
-              <LogOut className="size-4" /> Sign out
+              <LogOut className="size-4" /> {t("auth.signOut")}
             </DropdownMenuItem>
           </>
         )}

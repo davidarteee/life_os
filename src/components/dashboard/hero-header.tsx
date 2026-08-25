@@ -5,10 +5,15 @@ import { useSession } from "@/components/providers/session-provider";
 import { useSettings, useGameState, useGameConfig } from "@/hooks/use-game";
 import { LivesDisplay } from "@/components/game/lives-display";
 import { greetingKey } from "@/lib/date";
-import { levelTitle } from "@/lib/game/xp";
-import { appMeta } from "@/config/env";
+import { levelTitleKey } from "@/lib/game/xp";
 import { useT } from "@/hooks/use-t";
+import type { DictKey } from "@/lib/i18n";
 import { useLocaleStore } from "@/stores/locale-store";
+
+/** Capitalize only the first letter (Spanish/Catalan dates are lowercase). */
+function capitalizeFirst(s: string): string {
+  return s ? s.charAt(0).toUpperCase() + s.slice(1) : s;
+}
 
 /**
  * Curated landscape backdrops (Unsplash CDN). Loaded as a CSS background over an
@@ -50,7 +55,7 @@ export function HeroHeader() {
     settings?.heroMode === "custom" && settings.heroImageUrl ? settings.heroImageUrl : autoImage;
 
   const greet = t(`greeting.${greetingKey(now ?? new Date())}` as const);
-  const dateStr = now?.toLocaleDateString(locale, { weekday: "long", day: "numeric", month: "long" }) ?? "";
+  const dateStr = capitalizeFirst(now?.toLocaleDateString(locale, { weekday: "long", day: "numeric", month: "long" }) ?? "");
   const timeStr = now?.toLocaleTimeString(locale, { hour: "2-digit", minute: "2-digit" }) ?? "";
 
   return (
@@ -66,11 +71,11 @@ export function HeroHeader() {
 
       <div className="relative z-10 flex min-h-[200px] flex-col justify-between gap-6 p-5 md:min-h-[240px] md:flex-row md:items-end md:p-7">
         <div className="max-w-lg">
-          <p className="text-xs font-medium uppercase tracking-wider text-primary">{appMeta.tagline}</p>
+          <p className="text-xs font-medium uppercase tracking-wider text-primary">{t("app.tagline")}</p>
           <h1 className="mt-2 font-heading text-2xl font-bold tracking-tight text-balance md:text-4xl">
             {greet}{user?.name ? `, ${user.name}` : ""}
           </h1>
-          <p className="mt-1 text-sm capitalize text-muted-foreground md:text-base">{dateStr}</p>
+          <p className="mt-1 text-sm text-muted-foreground md:text-base">{dateStr}</p>
         </div>
 
         <div className="flex items-center gap-5">
@@ -84,8 +89,8 @@ export function HeroHeader() {
                   {progress.level}
                 </span>
                 <div className="text-left">
-                  <p className="text-xs font-medium leading-none">{levelTitle(progress.level)}</p>
-                  <p className="mt-0.5 text-[11px] text-muted-foreground">{progress.xpRemaining} XP to go</p>
+                  <p className="text-xs font-medium leading-none">{t(levelTitleKey(progress.level) as DictKey)}</p>
+                  <p className="mt-0.5 text-[11px] text-muted-foreground">{t("game.xpToGo", { n: progress.xpRemaining })}</p>
                 </div>
               </div>
               <LivesDisplay lives={state.lives} max={config.lives.maxLives} size="sm" />

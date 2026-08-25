@@ -7,13 +7,14 @@ import { useGameState, useGameConfig } from "@/hooks/use-game";
 import { buyShopItem } from "@/lib/data/game";
 import { Button } from "@/components/ui/button";
 import { useT } from "@/hooks/use-t";
+import type { DictKey } from "@/lib/i18n";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 
-const ITEMS: { id: ShopItemId; icon: typeof Heart; label: string; desc: string; accent: string }[] = [
-  { id: "extra_life", icon: Heart, label: "Extra life", desc: "Restore one heart", accent: "text-life" },
-  { id: "free_day", icon: CalendarOff, label: "Free day", desc: "Skip today's habits, no penalty", accent: "text-health" },
-  { id: "streak_shield", icon: Shield, label: "Streak shield", desc: "Absorbs one missed day", accent: "text-info" },
+const ITEMS: { id: ShopItemId; icon: typeof Heart; labelKey: DictKey; descKey: DictKey; accent: string }[] = [
+  { id: "extra_life", icon: Heart, labelKey: "shop.extraLife", descKey: "shop.extraLifeDesc", accent: "text-life" },
+  { id: "free_day", icon: CalendarOff, labelKey: "shop.freeDay", descKey: "shop.freeDayDesc", accent: "text-health" },
+  { id: "streak_shield", icon: Shield, labelKey: "shop.streakShield", descKey: "shop.streakShieldDesc", accent: "text-info" },
 ];
 
 export function ShopPanel() {
@@ -26,9 +27,9 @@ export function ShopPanel() {
   async function buy(item: ShopItemId) {
     if (!user) return;
     const res = await buyShopItem(user.id, item, config);
-    if (res.ok) toast.success("Purchased", { description: `-${config.shop[item]} XP` });
-    else if (res.reason === "insufficient") toast.error("Not enough XP");
-    else if (res.reason === "max_lives") toast.error("Lives already full");
+    if (res.ok) toast.success(t("game.purchased"), { description: `-${config.shop[item]} XP` });
+    else if (res.reason === "insufficient") toast.error(t("game.notEnoughXp"));
+    else if (res.reason === "max_lives") toast.error(t("game.livesFull"));
   }
 
   return (
@@ -47,8 +48,8 @@ export function ShopPanel() {
               <Icon className="size-4.5" />
             </div>
             <div className="min-w-0 flex-1">
-              <p className="text-sm font-medium">{it.label}</p>
-              <p className="truncate text-xs text-muted-foreground">{it.desc}</p>
+              <p className="text-sm font-medium">{t(it.labelKey)}</p>
+              <p className="truncate text-xs text-muted-foreground">{t(it.descKey)}</p>
             </div>
             <Button size="sm" variant="outline" disabled={disabled} onClick={() => buy(it.id)} className="shrink-0 tabular-nums">
               {cost} XP

@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { HeartCrack, Dices } from "lucide-react";
 import { CHALLENGES, pickWeightedChallenge, type ChallengeDef } from "@/lib/game/challenges-def";
+import { describeChallenge } from "@/lib/i18n/content";
 import { Button } from "@/components/ui/button";
 import { useT } from "@/hooks/use-t";
 import { cn } from "@/lib/utils";
@@ -28,7 +29,7 @@ function buildReel(winner: ChallengeDef): { reel: ChallengeDef[]; winnerIndex: n
  * to land on it. Accepting creates the challenge (handled by the parent).
  */
 export function ChallengeRoulette({ onAccept }: { onAccept: (def: ChallengeDef) => void }) {
-  const { t } = useT();
+  const { t, locale } = useT();
   const [phase, setPhase] = useState<Phase>("idle");
   const [offset, setOffset] = useState(0);
   const [transition, setTransition] = useState(false);
@@ -91,7 +92,7 @@ export function ChallengeRoulette({ onAccept }: { onAccept: (def: ChallengeDef) 
                 className="flex items-center justify-center px-4 text-center"
                 style={{ height: ROW_H }}
               >
-                <span className="font-heading text-lg font-semibold text-white/90">{c.title}</span>
+                <span className="font-heading text-lg font-semibold text-white/90">{describeChallenge(locale, c.id).title}</span>
               </div>
             ))}
           </div>
@@ -111,10 +112,10 @@ export function ChallengeRoulette({ onAccept }: { onAccept: (def: ChallengeDef) 
         {phase === "done" && winner && (
           <div className="flex w-full flex-col items-center gap-3 rounded-2xl border border-primary/30 bg-card/80 p-4 text-center animate-pop-in">
             <span className="text-xs font-semibold uppercase tracking-wider text-primary">{t("challenge.yourChallenge")}</span>
-            <p className="font-heading text-xl font-bold">{winner.title}</p>
-            <p className="text-sm text-muted-foreground">{winner.description}</p>
+            <p className="font-heading text-xl font-bold">{describeChallenge(locale, winner.id).title}</p>
+            <p className="text-sm text-muted-foreground">{describeChallenge(locale, winner.id).description}</p>
             <Button className="mt-1 w-full" size="lg" onClick={() => onAccept(winner)}>
-              Accept challenge
+              {t("challenge.accept")}
             </Button>
           </div>
         )}

@@ -6,6 +6,7 @@ import { NavList } from "@/components/layout/nav-list";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Button } from "@/components/ui/button";
 import { useUIStore } from "@/stores/ui-store";
+import { useT } from "@/hooks/use-t";
 import { cn } from "@/lib/utils";
 
 /**
@@ -15,6 +16,7 @@ import { cn } from "@/lib/utils";
 export function AppSidebar() {
   const collapsed = useUIStore((s) => s.sidebarCollapsed);
   const toggle = useUIStore((s) => s.toggleSidebar);
+  const { t } = useT();
 
   return (
     <aside
@@ -31,7 +33,7 @@ export function AppSidebar() {
           size="icon"
           className="size-8 text-muted-foreground"
           onClick={toggle}
-          aria-label="Collapse sidebar"
+          aria-label={t("nav.collapseSidebar")}
         >
           <PanelLeftClose className="size-4" />
         </Button>

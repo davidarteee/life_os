@@ -3,21 +3,24 @@ import { createHabit, type HabitInput } from "@/lib/data/habits";
 import { getGameState, recomputeAchievements } from "@/lib/data/game";
 import { getSettings } from "@/lib/data/settings";
 import type { Domain } from "@/lib/types";
+import { translate, type DictKey } from "@/lib/i18n";
+import { useLocaleStore } from "@/stores/locale-store";
 
 /**
- * Default habits from the LifeOS spec. Seeded once for a new user; not
- * system-locked — the user can edit, reorder, or delete any of them.
+ * Default habits from the LifeOS spec. Seeded once for a new user in their
+ * current language; not system-locked — the user can edit, reorder or delete
+ * any of them.
  */
-const DEFAULT_HABITS: HabitInput[] = [
-  { name: "Sleep 8 hours", icon: "Moon", color: "health", required: true },
-  { name: "Exercise", icon: "Dumbbell", color: "health", required: true },
-  { name: "Stretch", icon: "StretchHorizontal", color: "health", required: true },
-  { name: "Read 10 minutes", icon: "BookOpen", color: "learning", required: true },
-  { name: "Cold shower", icon: "Snowflake", color: "health", required: false },
-  { name: "No cheat meals", icon: "Salad", color: "health", required: true },
-  { name: "Meditate 5 minutes", icon: "Brain", color: "goals", required: true },
-  { name: "Write", icon: "PenLine", color: "productivity", required: false },
-  { name: "Register nutrition", icon: "Apple", color: "health", required: true },
+const DEFAULT_HABITS: (HabitInput & { nameKey: DictKey })[] = [
+  { nameKey: "seed.sleep", name: "", icon: "Moon", color: "health", required: true },
+  { nameKey: "seed.exercise", name: "", icon: "Dumbbell", color: "health", required: true },
+  { nameKey: "seed.stretch", name: "", icon: "StretchHorizontal", color: "health", required: true },
+  { nameKey: "seed.read", name: "", icon: "BookOpen", color: "learning", required: true },
+  { nameKey: "seed.coldShower", name: "", icon: "Snowflake", color: "health", required: false },
+  { nameKey: "seed.noCheat", name: "", icon: "Salad", color: "health", required: true },
+  { nameKey: "seed.meditate", name: "", icon: "Brain", color: "goals", required: true },
+  { nameKey: "seed.write", name: "", icon: "PenLine", color: "productivity", required: false },
+  { nameKey: "seed.nutrition", name: "", icon: "Apple", color: "health", required: true },
 ];
 
 const BOOTSTRAP_KEY = (userId: string) => `lifeos:bootstrapped:${userId}`;
@@ -35,8 +38,9 @@ export async function ensureUserData(userId: string): Promise<void> {
   await getGameState(userId);
 
   if (!marker && habitCount === 0) {
+    const locale = useLocaleStore.getState().locale;
     for (const h of DEFAULT_HABITS) {
-      await createHabit(userId, h);
+      await createHabit(userId, { ...h, name: translate(locale, h.nameKey) });
     }
     await recomputeAchievements(userId);
     if (typeof localStorage !== "undefined") {

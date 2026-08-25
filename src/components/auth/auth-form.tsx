@@ -10,6 +10,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
+import { useT } from "@/hooks/use-t";
 import { toast } from "sonner";
 
 function GoogleIcon() {
@@ -25,6 +26,7 @@ function GoogleIcon() {
 
 export function AuthForm({ mode }: { mode: "login" | "signup" }) {
   const { isLocalMode, status, signInWithEmail, signUpWithEmail, signInWithGoogle } = useSession();
+  const { t } = useT();
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -43,14 +45,11 @@ export function AuthForm({ mode }: { mode: "login" | "signup" }) {
             <HardDriveDownload className="size-6" />
           </div>
           <div>
-            <p className="font-heading text-lg font-semibold">Local mode</p>
-            <p className="mt-1 text-sm text-muted-foreground">
-              Cloud accounts aren&apos;t configured yet. Your data is stored securely on this device.
-              Add Supabase keys to enable sign-in and cross-device sync.
-            </p>
+            <p className="font-heading text-lg font-semibold">{t("auth.localTitle")}</p>
+            <p className="mt-1 text-sm text-muted-foreground">{t("auth.localDesc")}</p>
           </div>
-          <Button onClick={() => router.push("/dashboard")} className="w-full">Enter LifeOS</Button>
-          <p className="text-xs text-muted-foreground">See <code className="rounded bg-muted px-1">docs/SETUP.md</code> to connect Supabase.</p>
+          <Button onClick={() => router.push("/dashboard")} className="w-full">{t("auth.enter")}</Button>
+          <p className="text-xs text-muted-foreground">{t("auth.setupHint")}</p>
         </CardContent>
       </Card>
     );
@@ -63,38 +62,38 @@ export function AuthForm({ mode }: { mode: "login" | "signup" }) {
     const { error } = await fn(email, password);
     setLoading(false);
     if (error) toast.error(error);
-    else if (mode === "signup") toast.success("Check your email to confirm your account.");
+    else if (mode === "signup") toast.success(t("auth.confirmEmail"));
   }
 
   return (
     <Card>
       <CardContent className="flex flex-col gap-4 py-6">
         <Button variant="outline" className="w-full gap-2" onClick={() => signInWithGoogle()}>
-          <GoogleIcon /> Continue with Google
+          <GoogleIcon /> {t("auth.continueGoogle")}
         </Button>
         <div className="flex items-center gap-3">
           <Separator className="flex-1" />
-          <span className="text-xs text-muted-foreground">or</span>
+          <span className="text-xs text-muted-foreground">{t("auth.or")}</span>
           <Separator className="flex-1" />
         </div>
         <form onSubmit={onSubmit} className="flex flex-col gap-3">
           <div className="grid gap-1.5">
-            <Label htmlFor="email">Email</Label>
+            <Label htmlFor="email">{t("auth.email")}</Label>
             <Input id="email" type="email" autoComplete="email" required value={email} onChange={(e) => setEmail(e.target.value)} />
           </div>
           <div className="grid gap-1.5">
-            <Label htmlFor="password">Password</Label>
+            <Label htmlFor="password">{t("auth.password")}</Label>
             <Input id="password" type="password" autoComplete={mode === "login" ? "current-password" : "new-password"} required minLength={6} value={password} onChange={(e) => setPassword(e.target.value)} />
           </div>
           <Button type="submit" className="mt-1 w-full" disabled={loading}>
-            {loading ? "…" : mode === "login" ? "Sign in" : "Create account"}
+            {loading ? "…" : mode === "login" ? t("auth.signIn") : t("auth.createAccount")}
           </Button>
         </form>
         <p className="text-center text-sm text-muted-foreground">
           {mode === "login" ? (
-            <>No account? <Link href="/signup" className="text-primary hover:underline">Sign up</Link></>
+            <>{t("auth.noAccount")} <Link href="/signup" className="text-primary hover:underline">{t("auth.signUp")}</Link></>
           ) : (
-            <>Already have an account? <Link href="/login" className="text-primary hover:underline">Sign in</Link></>
+            <>{t("auth.haveAccount")} <Link href="/login" className="text-primary hover:underline">{t("auth.signIn")}</Link></>
           )}
         </p>
       </CardContent>

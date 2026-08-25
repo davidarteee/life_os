@@ -3,10 +3,12 @@
 import { useEffect, useState } from "react";
 import { useUserId } from "@/components/providers/session-provider";
 import { Textarea } from "@/components/ui/textarea";
+import { useT } from "@/hooks/use-t";
 
 /** Frictionless scratchpad, persisted per user in localStorage. */
 export function QuickNoteWidget() {
   const uid = useUserId();
+  const { t } = useT();
   const key = `lifeos:quicknote:${uid ?? "anon"}`;
   const [value, setValue] = useState("");
 
@@ -21,7 +23,7 @@ export function QuickNoteWidget() {
         setValue(e.target.value);
         if (typeof localStorage !== "undefined") localStorage.setItem(key, e.target.value);
       }}
-      placeholder="Jot something down…"
+      placeholder={t("widgets.jotPlaceholder")}
       className="h-full min-h-32 resize-none border-none bg-transparent p-0 shadow-none focus-visible:ring-0"
     />
   );

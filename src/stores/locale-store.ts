@@ -15,7 +15,8 @@ interface LocaleState {
 export const useLocaleStore = create<LocaleState>()(
   persist(
     (set) => ({
-      locale: "en",
+      // Spanish is the default/primary language; users can switch in Settings.
+      locale: "es",
       setLocale: (locale) => set({ locale }),
     }),
     { name: "lifeos:locale" },

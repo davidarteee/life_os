@@ -1,7 +1,8 @@
 "use client";
 
-import { levelTitle, type LevelProgress } from "@/lib/game/xp";
+import { levelTitleKey, type LevelProgress } from "@/lib/game/xp";
 import { useT } from "@/hooks/use-t";
+import type { DictKey } from "@/lib/i18n";
 import { cn } from "@/lib/utils";
 
 interface XpBarProps {
@@ -21,7 +22,7 @@ export function XpBar({ progress, showTitle = true, compact = false, className }
           <span className={cn("font-heading font-bold text-primary", compact ? "text-base" : "text-lg")}>
             {t("common.level")} {progress.level}
           </span>
-          {showTitle && <span className="text-xs text-muted-foreground">{levelTitle(progress.level)}</span>}
+          {showTitle && <span className="text-xs text-muted-foreground">{t(levelTitleKey(progress.level) as DictKey)}</span>}
         </div>
         <span className="text-xs tabular-nums text-muted-foreground">
           {progress.xpIntoLevel} / {progress.xpForLevel} XP

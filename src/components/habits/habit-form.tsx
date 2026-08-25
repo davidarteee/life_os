@@ -58,14 +58,14 @@ export function HabitForm({ open, onOpenChange, habit }: HabitFormProps) {
     } else {
       await createHabit(uid, payload);
     }
-    toast.success(editing ? "Habit updated" : "Habit created");
+    toast.success(editing ? t("habits.updated") : t("habits.created"));
     onOpenChange(false);
   }
 
   async function onDelete() {
     if (!habit) return;
     await deleteHabit(uid, habit.id);
-    toast.success("Habit deleted");
+    toast.success(t("habits.deleted"));
     onOpenChange(false);
   }
 
@@ -79,12 +79,12 @@ export function HabitForm({ open, onOpenChange, habit }: HabitFormProps) {
         <div className="flex flex-col gap-4">
           <div className="grid gap-1.5">
             <Label htmlFor="habit-name">{t("habits.name")}</Label>
-            <Input id="habit-name" value={name} onChange={(e) => setName(e.target.value)} autoFocus placeholder="e.g. Meditate 5 minutes" />
+            <Input id="habit-name" value={name} onChange={(e) => setName(e.target.value)} autoFocus placeholder={t("habits.namePlaceholder")} />
           </div>
 
           {/* Icon picker */}
           <div className="grid gap-1.5">
-            <Label>Icon</Label>
+            <Label>{t("common.icon")}</Label>
             <div className="grid grid-cols-8 gap-1.5">
               {ICON_NAMES.map((n) => {
                 const I = resolveIcon(n);
@@ -108,7 +108,7 @@ export function HabitForm({ open, onOpenChange, habit }: HabitFormProps) {
 
           {/* Color */}
           <div className="grid gap-1.5">
-            <Label>Color</Label>
+            <Label>{t("common.color")}</Label>
             <div className="flex flex-wrap gap-2">
               {COLORS.map((c) => (
                 <button
@@ -124,13 +124,13 @@ export function HabitForm({ open, onOpenChange, habit }: HabitFormProps) {
 
           {/* Cadence */}
           <div className="grid gap-1.5">
-            <Label>Cadence</Label>
+            <Label>{t("habits.cadence")}</Label>
             <Select value={cadence} onValueChange={(v) => setCadence(v as Habit["cadence"])}>
               <SelectTrigger><SelectValue /></SelectTrigger>
               <SelectContent>
-                <SelectItem value="daily">Every day</SelectItem>
-                <SelectItem value="weekdays">Weekdays</SelectItem>
-                <SelectItem value="custom">Custom days</SelectItem>
+                <SelectItem value="daily">{t("habits.cadence.daily")}</SelectItem>
+                <SelectItem value="weekdays">{t("habits.cadence.weekdays")}</SelectItem>
+                <SelectItem value="custom">{t("habits.cadence.custom")}</SelectItem>
               </SelectContent>
             </Select>
             {cadence === "custom" && (
@@ -140,11 +140,11 @@ export function HabitForm({ open, onOpenChange, habit }: HabitFormProps) {
                     key={wd}
                     onClick={() => setCustomDays((d) => (d.includes(i) ? d.filter((x) => x !== i) : [...d, i]))}
                     className={cn(
-                      "flex-1 rounded-md border py-1.5 text-xs capitalize transition-colors",
+                      "flex-1 rounded-md border py-1.5 text-xs transition-colors",
                       customDays.includes(i) ? "border-primary bg-primary/10 text-primary" : "border-border/60 text-muted-foreground",
                     )}
                   >
-                    {wd}
+                    {t(`weekday.${wd}` as const)}
                   </button>
                 ))}
               </div>
@@ -157,8 +157,8 @@ export function HabitForm({ open, onOpenChange, habit }: HabitFormProps) {
               <Input id="habit-target" type="number" min={1} value={target} onChange={(e) => setTarget(Number(e.target.value))} />
             </div>
             <div className="grid gap-1.5">
-              <Label htmlFor="habit-unit">Unit</Label>
-              <Input id="habit-unit" value={unit} onChange={(e) => setUnit(e.target.value)} placeholder="min, km…" />
+              <Label htmlFor="habit-unit">{t("common.unit")}</Label>
+              <Input id="habit-unit" value={unit} onChange={(e) => setUnit(e.target.value)} placeholder={t("habits.unitPlaceholder")} />
             </div>
           </div>
 
@@ -170,7 +170,7 @@ export function HabitForm({ open, onOpenChange, habit }: HabitFormProps) {
           <div className="flex items-center justify-between rounded-lg border border-border/60 px-3 py-2.5">
             <div>
               <p className="text-sm font-medium">{t("habits.required")}</p>
-              <p className="text-xs text-muted-foreground">Counts toward lives &amp; perfect days</p>
+              <p className="text-xs text-muted-foreground">{t("habits.requiredHint")}</p>
             </div>
             <Switch checked={required} onCheckedChange={setRequired} />
           </div>

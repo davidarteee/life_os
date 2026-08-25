@@ -23,7 +23,7 @@ export default function AchievementsPage() {
       <div className="mb-6 grid grid-cols-2 gap-3 md:grid-cols-3">
         <StatTile label={t("game.unlocked")} value={`${unlocked}/${total}`} icon={Trophy} accentClass="text-gold" />
         <StatTile label={t("game.locked")} value={total - unlocked} icon={Lock} />
-        <StatTile label="XP from achievements" value={earnedXp} icon={Sparkles} accentClass="text-primary" />
+        <StatTile label={t("game.xpFromAchievements")} value={earnedXp} icon={Sparkles} accentClass="text-primary" />
       </div>
       <AchievementsGrid />
     </PageContainer>

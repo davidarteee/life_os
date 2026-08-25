@@ -36,10 +36,10 @@ export default function HabitsPage() {
       />
 
       <div className="mb-6 grid grid-cols-2 gap-3 lg:grid-cols-4">
-        <StatTile label="Active habits" value={stats?.length ?? 0} icon={CircleCheckBig} />
+        <StatTile label={t("habits.activeHabits")} value={stats?.length ?? 0} icon={CircleCheckBig} />
         <StatTile label={t("common.today")} value={`${doneToday}/${items.length}`} icon={CheckCheck} accentClass="text-health" />
-        <StatTile label="Best streak" value={bestStreak} icon={Flame} accentClass="text-warning" hint="days" />
-        <StatTile label="Total completed" value={totalCompleted} icon={TrendingUp} accentClass="text-primary" />
+        <StatTile label={t("habits.bestStreak")} value={bestStreak} icon={Flame} accentClass="text-warning" hint={t("common.days")} />
+        <StatTile label={t("habits.totalCompleted")} value={totalCompleted} icon={TrendingUp} accentClass="text-primary" />
       </div>
 
       <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.2fr)]">

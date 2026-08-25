@@ -45,7 +45,7 @@ export default function SettingsPage() {
   async function saveGame() {
     if (!game) return;
     await patch({ game });
-    toast.success("Gamification settings saved");
+    toast.success(t("settings.saved"));
   }
 
   const num = (path: (g: GameConfig) => number, set: (g: GameConfig, v: number) => GameConfig, label: string) => (
@@ -67,14 +67,14 @@ export default function SettingsPage() {
         {/* Profile */}
         <Card>
           <CardHeader className="pb-3">
-            <CardTitle className="text-base">Profile</CardTitle>
+            <CardTitle className="text-base">{t("settings.profile")}</CardTitle>
           </CardHeader>
           <CardContent className="flex flex-col gap-1 text-sm">
-            <div className="flex justify-between"><span className="text-muted-foreground">Name</span><span>{user.name}</span></div>
-            <div className="flex justify-between"><span className="text-muted-foreground">Email</span><span>{user.email ?? "—"}</span></div>
+            <div className="flex justify-between"><span className="text-muted-foreground">{t("common.name")}</span><span>{user.name}</span></div>
+            <div className="flex justify-between"><span className="text-muted-foreground">{t("common.email")}</span><span>{user.email ?? "—"}</span></div>
             <div className="flex justify-between">
-              <span className="text-muted-foreground">Mode</span>
-              <Badge variant="outline">{isLocalMode ? t("offline.localMode") : "Cloud account"}</Badge>
+              <span className="text-muted-foreground">{t("settings.mode")}</span>
+              <Badge variant="outline">{isLocalMode ? t("offline.localMode") : t("settings.cloudAccount")}</Badge>
             </div>
           </CardContent>
         </Card>
@@ -82,11 +82,11 @@ export default function SettingsPage() {
         {/* Language & currency */}
         <Card>
           <CardHeader className="pb-3">
-            <CardTitle className="flex items-center gap-2 text-base"><Globe className="size-4" /> Language &amp; region</CardTitle>
+            <CardTitle className="flex items-center gap-2 text-base"><Globe className="size-4" /> {t("settings.langRegion")}</CardTitle>
           </CardHeader>
           <CardContent className="grid gap-4 sm:grid-cols-2">
             <div className="grid gap-1.5">
-              <Label className="flex items-center gap-1.5 text-xs text-muted-foreground"><Globe className="size-3" /> Language</Label>
+              <Label className="flex items-center gap-1.5 text-xs text-muted-foreground"><Globe className="size-3" /> {t("settings.language")}</Label>
               <Select
                 value={settings.locale}
                 onValueChange={(v) => { setLocale(v as Locale); patch({ locale: v as Locale }); }}
@@ -98,7 +98,7 @@ export default function SettingsPage() {
               </Select>
             </div>
             <div className="grid gap-1.5">
-              <Label className="flex items-center gap-1.5 text-xs text-muted-foreground"><Coins className="size-3" /> Currency</Label>
+              <Label className="flex items-center gap-1.5 text-xs text-muted-foreground"><Coins className="size-3" /> {t("settings.currency")}</Label>
               <Select value={settings.currency} onValueChange={(v) => patch({ currency: v })}>
                 <SelectTrigger><SelectValue /></SelectTrigger>
                 <SelectContent>
@@ -112,25 +112,25 @@ export default function SettingsPage() {
         {/* Appearance */}
         <Card>
           <CardHeader className="pb-3">
-            <CardTitle className="flex items-center gap-2 text-base"><Palette className="size-4" /> Appearance</CardTitle>
+            <CardTitle className="flex items-center gap-2 text-base"><Palette className="size-4" /> {t("settings.appearance")}</CardTitle>
           </CardHeader>
           <CardContent className="flex flex-col gap-4">
             <div className="grid gap-1.5">
-              <Label className="text-xs text-muted-foreground">Theme</Label>
+              <Label className="text-xs text-muted-foreground">{t("settings.theme")}</Label>
               <div className="flex gap-2">
                 {(["dark", "light"] as const).map((th) => (
-                  <Button key={th} variant={theme === th ? "default" : "outline"} size="sm" onClick={() => setTheme(th)} className="capitalize">
-                    {th}
+                  <Button key={th} variant={theme === th ? "default" : "outline"} size="sm" onClick={() => setTheme(th)}>
+                    {th === "dark" ? t("settings.themeDark") : t("settings.themeLight")}
                   </Button>
                 ))}
               </div>
             </div>
             <div className="grid gap-1.5">
-              <Label className="text-xs text-muted-foreground">Hero image</Label>
+              <Label className="text-xs text-muted-foreground">{t("settings.heroImage")}</Label>
               <div className="flex gap-2">
                 {(["auto", "custom"] as const).map((m) => (
-                  <Button key={m} variant={settings.heroMode === m ? "default" : "outline"} size="sm" onClick={() => patch({ heroMode: m })} className="capitalize">
-                    {m}
+                  <Button key={m} variant={settings.heroMode === m ? "default" : "outline"} size="sm" onClick={() => patch({ heroMode: m })}>
+                    {m === "auto" ? t("settings.heroAuto") : t("settings.heroCustom")}
                   </Button>
                 ))}
               </div>
@@ -149,34 +149,34 @@ export default function SettingsPage() {
         {/* Gamification */}
         <Card>
           <CardHeader className="flex-row items-center justify-between pb-3">
-            <CardTitle className="flex items-center gap-2 text-base"><Gamepad2 className="size-4" /> Gamification</CardTitle>
+            <CardTitle className="flex items-center gap-2 text-base"><Gamepad2 className="size-4" /> {t("settings.gamification")}</CardTitle>
             <Button size="sm" onClick={saveGame} className="gap-1.5"><Save className="size-4" /> {t("common.save")}</Button>
           </CardHeader>
           <CardContent className="flex flex-col gap-5">
             <div>
-              <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">XP rewards</p>
+              <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">{t("settings.xpRewards")}</p>
               <div className="grid gap-3 sm:grid-cols-3">
-                {num((g) => g.xp.habitComplete, (g, v) => ({ ...g, xp: { ...g.xp, habitComplete: v } }), "Habit complete")}
-                {num((g) => g.xp.allHabitsBonus, (g, v) => ({ ...g, xp: { ...g.xp, allHabitsBonus: v } }), "All-habits bonus")}
-                {num((g) => g.xp.nutritionTarget, (g, v) => ({ ...g, xp: { ...g.xp, nutritionTarget: v } }), "Nutrition target")}
-                {num((g) => g.xp.taskLow, (g, v) => ({ ...g, xp: { ...g.xp, taskLow: v } }), "Task · low")}
-                {num((g) => g.xp.taskMedium, (g, v) => ({ ...g, xp: { ...g.xp, taskMedium: v } }), "Task · medium")}
-                {num((g) => g.xp.taskHigh, (g, v) => ({ ...g, xp: { ...g.xp, taskHigh: v } }), "Task · high")}
+                {num((g) => g.xp.habitComplete, (g, v) => ({ ...g, xp: { ...g.xp, habitComplete: v } }), t("settings.habitComplete"))}
+                {num((g) => g.xp.allHabitsBonus, (g, v) => ({ ...g, xp: { ...g.xp, allHabitsBonus: v } }), t("settings.allHabitsBonus"))}
+                {num((g) => g.xp.nutritionTarget, (g, v) => ({ ...g, xp: { ...g.xp, nutritionTarget: v } }), t("settings.nutritionTarget"))}
+                {num((g) => g.xp.taskLow, (g, v) => ({ ...g, xp: { ...g.xp, taskLow: v } }), t("settings.taskLow"))}
+                {num((g) => g.xp.taskMedium, (g, v) => ({ ...g, xp: { ...g.xp, taskMedium: v } }), t("settings.taskMedium"))}
+                {num((g) => g.xp.taskHigh, (g, v) => ({ ...g, xp: { ...g.xp, taskHigh: v } }), t("settings.taskHigh"))}
               </div>
             </div>
             <div>
-              <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">Lives</p>
+              <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">{t("settings.livesSection")}</p>
               <div className="grid gap-3 sm:grid-cols-2">
-                {num((g) => g.lives.maxLives, (g, v) => ({ ...g, lives: { ...g.lives, maxLives: v } }), "Max lives")}
-                {num((g) => g.lives.missThreshold, (g, v) => ({ ...g, lives: { ...g.lives, missThreshold: v } }), "Miss threshold (lose a life)")}
+                {num((g) => g.lives.maxLives, (g, v) => ({ ...g, lives: { ...g.lives, maxLives: v } }), t("settings.maxLives"))}
+                {num((g) => g.lives.missThreshold, (g, v) => ({ ...g, lives: { ...g.lives, missThreshold: v } }), t("settings.missThreshold"))}
               </div>
             </div>
             <div>
-              <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">Shop prices</p>
+              <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">{t("settings.shopPrices")}</p>
               <div className="grid gap-3 sm:grid-cols-3">
-                {num((g) => g.shop.extra_life, (g, v) => ({ ...g, shop: { ...g.shop, extra_life: v } }), "Extra life")}
-                {num((g) => g.shop.free_day, (g, v) => ({ ...g, shop: { ...g.shop, free_day: v } }), "Free day")}
-                {num((g) => g.shop.streak_shield, (g, v) => ({ ...g, shop: { ...g.shop, streak_shield: v } }), "Streak shield")}
+                {num((g) => g.shop.extra_life, (g, v) => ({ ...g, shop: { ...g.shop, extra_life: v } }), t("shop.extraLife"))}
+                {num((g) => g.shop.free_day, (g, v) => ({ ...g, shop: { ...g.shop, free_day: v } }), t("shop.freeDay"))}
+                {num((g) => g.shop.streak_shield, (g, v) => ({ ...g, shop: { ...g.shop, streak_shield: v } }), t("shop.streakShield"))}
               </div>
             </div>
           </CardContent>
@@ -185,15 +185,15 @@ export default function SettingsPage() {
         {/* Data export */}
         <Card>
           <CardHeader className="pb-3">
-            <CardTitle className="flex items-center gap-2 text-base"><Download className="size-4" /> Your data</CardTitle>
-            <CardDescription>Export a portable copy of everything stored on this device.</CardDescription>
+            <CardTitle className="flex items-center gap-2 text-base"><Download className="size-4" /> {t("settings.yourData")}</CardTitle>
+            <CardDescription>{t("settings.yourDataDesc")}</CardDescription>
           </CardHeader>
           <CardContent className="flex flex-wrap gap-2">
             <Button variant="outline" size="sm" onClick={async () => downloadFile(`lifeos-export-${Date.now()}.json`, await exportUserJSON(user.id))}>
-              Export JSON
+              {t("settings.exportJson")}
             </Button>
             <Button variant="outline" size="sm" onClick={async () => downloadFile(`lifeos-habits-${Date.now()}.csv`, await exportHabitsCSV(user.id), "text/csv")}>
-              Export habits CSV
+              {t("settings.exportCsv")}
             </Button>
           </CardContent>
         </Card>
@@ -201,15 +201,15 @@ export default function SettingsPage() {
         {/* Integrations */}
         <Card>
           <CardHeader className="pb-3">
-            <CardTitle className="flex items-center gap-2 text-base"><Plug className="size-4" /> Integrations</CardTitle>
-            <CardDescription>Cloud sync and third-party services.</CardDescription>
+            <CardTitle className="flex items-center gap-2 text-base"><Plug className="size-4" /> {t("settings.integrations")}</CardTitle>
+            <CardDescription>{t("settings.integrationsDesc")}</CardDescription>
           </CardHeader>
           <CardContent className="flex flex-col gap-2 text-sm">
             {[
-              { name: "Supabase (auth + sync)", ready: isSupabaseConfigured, note: isSupabaseConfigured ? "Connected" : "Add keys in .env.local" },
-              { name: "Spotify", ready: false, note: "Roadmap · official OAuth" },
-              { name: "Strava / Suunto", ready: false, note: "Roadmap · activity import" },
-              { name: "Apple Calendar", ready: false, note: "Roadmap · ICS/CalDAV" },
+              { name: "Supabase (auth + sync)", ready: isSupabaseConfigured, note: isSupabaseConfigured ? t("settings.connected") : t("settings.addKeys") },
+              { name: "Spotify", ready: false, note: t("settings.roadmapOauth") },
+              { name: "Strava / Suunto", ready: false, note: t("settings.roadmapImport") },
+              { name: "Apple Calendar", ready: false, note: t("settings.roadmapIcs") },
             ].map((i) => (
               <div key={i.name} className="flex items-center justify-between rounded-lg border border-border/60 px-3 py-2">
                 <span>{i.name}</span>

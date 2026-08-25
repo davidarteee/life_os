@@ -5,6 +5,8 @@ import { useGameState, useChallenges } from "@/hooks/use-game";
 import { ChallengeRoulette } from "@/components/game/challenge-roulette";
 import { createChallenge } from "@/lib/data/game";
 import type { ChallengeDef } from "@/lib/game/challenges-def";
+import { describeChallenge } from "@/lib/i18n/content";
+import { useT } from "@/hooks/use-t";
 import { toast } from "sonner";
 
 /**
@@ -15,6 +17,7 @@ export function ChallengeWatcher() {
   const { user } = useSession();
   const { state } = useGameState();
   const { active } = useChallenges();
+  const { t, locale } = useT();
 
   const shouldShow = !!user && !!state && state.lives === 0 && !active;
   if (!shouldShow) return null;
@@ -22,7 +25,8 @@ export function ChallengeWatcher() {
   const onAccept = async (def: ChallengeDef) => {
     if (!user) return;
     await createChallenge(user.id, def);
-    toast("Challenge accepted", { description: `${def.title} — verify your evidence to restore your lives.` });
+    const title = describeChallenge(locale, def.id).title;
+    toast(t("challenge.accepted"), { description: t("challenge.acceptedDesc", { title }) });
   };
 
   return <ChallengeRoulette onAccept={onAccept} />;

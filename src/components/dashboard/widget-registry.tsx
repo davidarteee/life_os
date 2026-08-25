@@ -11,6 +11,7 @@ import { QuickNoteWidget } from "@/components/dashboard/widgets/quick-note";
 import { PomodoroWidget } from "@/components/dashboard/widgets/pomodoro";
 import { MonthOverviewWidget } from "@/components/dashboard/widgets/month-overview";
 import { StreaksWidget, LivesWidget, ComingSoonMini } from "@/components/dashboard/widgets/small-widgets";
+import { useT } from "@/hooks/use-t";
 
 function XpProgressWidget() {
   const { progress } = useGameState();
@@ -20,6 +21,7 @@ function XpProgressWidget() {
 
 /** Maps a widget id to its rendered content. */
 export function WidgetContent({ id }: { id: WidgetId }) {
+  const { t } = useT();
   switch (id) {
     case "today-habits":
       return <TodayHabits limit={6} />;
@@ -40,9 +42,9 @@ export function WidgetContent({ id }: { id: WidgetId }) {
     case "month-overview":
       return <MonthOverviewWidget />;
     case "coming-soon-health":
-      return <ComingSoonMini href="/nutrition" label="Health" icon={Apple} color="health" />;
+      return <ComingSoonMini href="/nutrition" label={t("widget.coming-soon-health")} icon={Apple} color="health" />;
     case "coming-soon-finance":
-      return <ComingSoonMini href="/investments" label="Finance" icon={LineChart} color="finance" />;
+      return <ComingSoonMini href="/investments" label={t("widget.coming-soon-finance")} icon={LineChart} color="finance" />;
     default:
       return null;
   }

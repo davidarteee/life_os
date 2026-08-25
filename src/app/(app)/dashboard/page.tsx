@@ -7,7 +7,6 @@ import { DashboardGrid } from "@/components/dashboard/dashboard-grid";
 import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { useDashboardStore } from "@/stores/dashboard-store";
-import { WIDGET_META } from "@/lib/dashboard/widgets";
 import { useT } from "@/hooks/use-t";
 
 export default function DashboardPage() {
@@ -39,7 +38,7 @@ export default function DashboardPage() {
                     ) : (
                       hidden.map((id) => (
                         <DropdownMenuItem key={id} onClick={() => show(id)}>
-                          {WIDGET_META.get(id)?.title ?? id}
+                          {t(`widget.${id}` as const)}
                         </DropdownMenuItem>
                       ))
                     )}
