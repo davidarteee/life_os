@@ -8,8 +8,9 @@ import { getSettings } from "@/lib/data/settings";
 import { reconcileLives } from "@/lib/data/game";
 import { runSync } from "@/lib/sync/sync-engine";
 import { useLocaleStore } from "@/stores/locale-store";
+import { LOCAL_USER_ID } from "@/lib/constants";
 
-export const LOCAL_USER_ID = "local-user";
+export { LOCAL_USER_ID };
 
 export interface LifeUser {
   id: string;
