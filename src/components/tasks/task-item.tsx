@@ -48,8 +48,7 @@ export function TaskItem({ task, onEdit, dragHandle, showDate = true }: TaskItem
   return (
     <div
       className={cn(
-        "group flex items-center gap-2 rounded-xl border border-l-2 border-border/60 bg-card px-2.5 py-2 transition-colors hover:border-border",
-        p.border,
+        "group flex items-center gap-2 rounded-xl border border-border/60 bg-card px-2.5 py-2 transition-colors hover:border-border",
         done && "opacity-60",
       )}
     >
