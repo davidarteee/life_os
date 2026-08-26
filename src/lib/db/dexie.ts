@@ -9,6 +9,7 @@ import type {
   UserAchievement,
   Challenge,
   UserSettings,
+  Task,
 } from "@/lib/types";
 
 /**
@@ -40,7 +41,8 @@ export type SyncTable =
   | "shop_purchases"
   | "user_achievements"
   | "challenges"
-  | "user_settings";
+  | "user_settings"
+  | "tasks";
 
 export class LifeOSDatabase extends Dexie {
   habits!: Table<Habit, string>;
@@ -52,6 +54,7 @@ export class LifeOSDatabase extends Dexie {
   userAchievements!: Table<UserAchievement, string>;
   challenges!: Table<Challenge, string>;
   settings!: Table<UserSettings, string>;
+  tasks!: Table<Task, string>;
   mutations!: Table<Mutation, string>;
 
   constructor() {
@@ -67,6 +70,10 @@ export class LifeOSDatabase extends Dexie {
       challenges: "id, user_id, status, assignedDay",
       settings: "id, user_id",
       mutations: "id, user_id, table, createdAt",
+    });
+    // v2 — Tasks + Calendar. Existing tables carry forward unchanged.
+    this.version(2).stores({
+      tasks: "id, user_id, status, date, order, [user_id+date], [user_id+status]",
     });
   }
 }

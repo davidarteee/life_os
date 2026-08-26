@@ -340,10 +340,15 @@ export async function computeCounters(userId: string): Promise<AchievementCounte
     if (requiredIds.size > 0 && done.size === requiredIds.size) perfectDays += 1;
   }
 
+  const tasksCompleted = activeRecords(await db().tasks.where("user_id").equals(userId).toArray()).filter(
+    (t) => t.status === "done",
+  ).length;
+
   return {
     habitsCompleted,
     habitStreak,
     perfectDays,
+    tasksCompleted,
     level: state.level,
     challengesVerified: challenges.filter((c) => c.status === "verified").length,
     xpTotal: state.xp,

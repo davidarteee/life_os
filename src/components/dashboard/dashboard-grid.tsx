@@ -9,7 +9,7 @@ import {
 import { CSS } from "@dnd-kit/utilities";
 import { GripVertical, EyeOff, Minus, Plus } from "lucide-react";
 import { useDashboardStore } from "@/stores/dashboard-store";
-import { WIDGET_META, type WidgetId } from "@/lib/dashboard/widgets";
+import { WIDGET_META, DEFAULT_WIDGET_ORDER, type WidgetId } from "@/lib/dashboard/widgets";
 import { WidgetContent } from "@/components/dashboard/widget-registry";
 import { Button } from "@/components/ui/button";
 import { useT } from "@/hooks/use-t";
@@ -74,7 +74,10 @@ export function DashboardGrid() {
   const hidden = useDashboardStore((s) => s.hidden);
   const reorder = useDashboardStore((s) => s.reorder);
 
-  const visible = order.filter((id) => id !== "hero-stats" && !hidden.includes(id));
+  // Self-heal: append any newly-added default widgets missing from a saved
+  // layout, so new modules (e.g. Tasks/Calendar) appear without a reset.
+  const fullOrder = [...order, ...DEFAULT_WIDGET_ORDER.filter((id) => !order.includes(id))];
+  const visible = fullOrder.filter((id) => id !== "hero-stats" && !hidden.includes(id));
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 6 } }),
     useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates }),
@@ -83,10 +86,10 @@ export function DashboardGrid() {
   function onDragEnd(e: DragEndEvent) {
     const { active, over } = e;
     if (!over || active.id === over.id) return;
-    const from = order.indexOf(active.id as WidgetId);
-    const to = order.indexOf(over.id as WidgetId);
+    const from = fullOrder.indexOf(active.id as WidgetId);
+    const to = fullOrder.indexOf(over.id as WidgetId);
     if (from < 0 || to < 0) return;
-    reorder(arrayMove(order, from, to));
+    reorder(arrayMove(fullOrder, from, to));
   }
 
   return (

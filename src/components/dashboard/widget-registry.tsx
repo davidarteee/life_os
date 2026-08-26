@@ -11,6 +11,7 @@ import { QuickNoteWidget } from "@/components/dashboard/widgets/quick-note";
 import { PomodoroWidget } from "@/components/dashboard/widgets/pomodoro";
 import { MonthOverviewWidget } from "@/components/dashboard/widgets/month-overview";
 import { StreaksWidget, LivesWidget, ComingSoonMini } from "@/components/dashboard/widgets/small-widgets";
+import { TodayTasksWidget, TaskInboxWidget, MiniCalendarWidget } from "@/components/dashboard/widgets/task-widgets";
 import { useT } from "@/hooks/use-t";
 
 function XpProgressWidget() {
@@ -25,6 +26,12 @@ export function WidgetContent({ id }: { id: WidgetId }) {
   switch (id) {
     case "today-habits":
       return <TodayHabits limit={6} />;
+    case "today-tasks":
+      return <TodayTasksWidget />;
+    case "task-inbox":
+      return <TaskInboxWidget />;
+    case "calendar":
+      return <MiniCalendarWidget />;
     case "gamification":
       return <GameStatusCard />;
     case "lives":

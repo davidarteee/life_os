@@ -31,6 +31,7 @@ const REGISTRY: Record<SyncTable, TableBinding> = {
   user_achievements: { local: () => db().userAchievements as unknown as Table<OwnedRecord, string>, remote: "user_achievements" },
   challenges: { local: () => db().challenges as unknown as Table<OwnedRecord, string>, remote: "challenges" },
   user_settings: { local: () => db().settings as unknown as Table<OwnedRecord, string>, remote: "user_settings" },
+  tasks: { local: () => db().tasks as unknown as Table<OwnedRecord, string>, remote: "tasks" },
 };
 
 const LAST_PULL_KEY = (userId: string) => `lifeos:lastPull:${userId}`;

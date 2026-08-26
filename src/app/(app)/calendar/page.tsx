@@ -1,8 +1,16 @@
 "use client";
 
-import { ComingSoon } from "@/components/layout/coming-soon";
 import { CalendarDays } from "lucide-react";
+import { PageContainer, PageHeader } from "@/components/layout/page-container";
+import { MonthCalendar } from "@/components/calendar/month-calendar";
+import { useT } from "@/hooks/use-t";
 
-export default function Page() {
-  return <ComingSoon titleKey="nav.calendar" icon={CalendarDays} points={["Monthly master calendar", "Tasks, exams, projects and free days", "Apple Calendar sync (roadmap)", ]} />;
+export default function CalendarPage() {
+  const { t } = useT();
+  return (
+    <PageContainer wide>
+      <PageHeader title={t("calendar.title")} description={t("calendar.subtitle")} icon={<CalendarDays className="size-5" />} />
+      <MonthCalendar />
+    </PageContainer>
+  );
 }

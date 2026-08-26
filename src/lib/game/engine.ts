@@ -78,6 +78,7 @@ export interface AchievementCounters {
   habitsCompleted: number;
   habitStreak: number;
   perfectDays: number;
+  tasksCompleted: number;
   level: number;
   challengesVerified: number;
   xpTotal: number;

@@ -30,9 +30,9 @@ export const NAV: NavSection[] = [
   {
     labelKey: "nav.section.productivity",
     items: [
-      { href: "/tasks", labelKey: "nav.tasks", icon: ListTodo },
+      { href: "/tasks", labelKey: "nav.tasks", icon: ListTodo, ready: true },
       { href: "/projects", labelKey: "nav.projects", icon: FolderKanban },
-      { href: "/calendar", labelKey: "nav.calendar", icon: CalendarDays },
+      { href: "/calendar", labelKey: "nav.calendar", icon: CalendarDays, ready: true },
       { href: "/study", labelKey: "nav.study", icon: GraduationCap },
       { href: "/notes", labelKey: "nav.notes", icon: StickyNote },
     ],

@@ -1,7 +1,8 @@
-import type { Habit, GameConfig, DayKey } from "@/lib/types";
+import type { Habit, Task, GameConfig, DayKey } from "@/lib/types";
 import { db } from "@/lib/db/dexie";
 import { activeRecords } from "@/lib/data/repository";
 import { advanceHabit, listHabits, logsForDay, isScheduledOn } from "@/lib/data/habits";
+import { toggleTask, taskXp } from "@/lib/data/tasks";
 import { awardXp, recomputeAchievements, type AchievementUnlock } from "@/lib/data/game";
 import { XP_REASON } from "@/lib/game/config";
 import { dayKey, weekdayIndex, fromDayKey } from "@/lib/date";
@@ -69,4 +70,36 @@ export async function toggleHabitAction(
 
   const unlocks = await recomputeAchievements(userId);
   return { becameCompleted, becameUncompleted, xpDelta, bonusDelta, unlocks };
+}
+
+export interface TaskToggleOutcome {
+  becameDone: boolean;
+  becameTodo: boolean;
+  xpDelta: number;
+  unlocks: AchievementUnlock[];
+}
+
+/**
+ * Toggle a task done/undone and reconcile XP (by priority) + achievements.
+ * Mirrors the habit action so both modules earn XP the same way.
+ */
+export async function toggleTaskAction(
+  userId: string,
+  task: Task,
+  config: GameConfig,
+): Promise<TaskToggleOutcome> {
+  const { becameDone, becameTodo } = await toggleTask(userId, task);
+  const xp = taskXp(task.priority, config.xp);
+
+  let xpDelta = 0;
+  if (becameDone) {
+    await awardXp(userId, xp, XP_REASON.taskComplete, { meta: { taskId: task.id, priority: task.priority } });
+    xpDelta = xp;
+  } else if (becameTodo) {
+    await awardXp(userId, -xp, XP_REASON.taskComplete, { meta: { taskId: task.id, reverse: true } });
+    xpDelta = -xp;
+  }
+
+  const unlocks = await recomputeAchievements(userId);
+  return { becameDone, becameTodo, xpDelta, unlocks };
 }

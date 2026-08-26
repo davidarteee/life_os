@@ -14,6 +14,7 @@ export type AchievementMetric =
   | "habitsCompleted" // lifetime completed habit-days
   | "habitStreak" // best current streak across habits
   | "perfectDays" // days where all required habits done
+  | "tasksCompleted" // lifetime completed tasks
   | "level"
   | "challengesVerified"
   | "xpTotal"
@@ -83,6 +84,17 @@ export const ACHIEVEMENTS: AchievementDefEx[] = [
     label: (n) => ({
       title: `${n}-Day Streak`,
       description: `Keep any habit alive for ${n} days straight.`,
+    }),
+  }),
+  ...milestones({
+    prefix: "tasks_done",
+    category: "productivity",
+    icon: "ListChecks",
+    metric: "tasksCompleted",
+    steps: [10, 100, 500, 1000],
+    label: (n) => ({
+      title: `${n} Tasks Done`,
+      description: `Complete ${n} tasks in total.`,
     }),
   }),
   ...milestones({

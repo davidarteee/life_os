@@ -64,6 +64,7 @@ describe("achievement resolution", () => {
     habitsCompleted: 12,
     habitStreak: 8,
     perfectDays: 1,
+    tasksCompleted: 0,
     level: 3,
     challengesVerified: 0,
     xpTotal: 400,

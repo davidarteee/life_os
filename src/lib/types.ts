@@ -62,6 +62,25 @@ export interface HabitLog extends OwnedRecord {
   completedAt?: ISODate;
 }
 
+/* ---------------------------------------------------------------- Tasks -- */
+
+export type TaskPriority = "low" | "medium" | "high";
+export type TaskStatus = "todo" | "done";
+
+export interface Task extends OwnedRecord {
+  title: string;
+  notes?: string;
+  priority: TaskPriority;
+  status: TaskStatus;
+  /** Scheduled day (YYYY-MM-DD). Undefined = inbox / backlog (no date yet). */
+  date?: DayKey;
+  /** Optional deadline, independent of the scheduled day. */
+  dueDate?: DayKey;
+  completedAt?: ISODate;
+  /** Sort order within its list (inbox or a given day). */
+  order: number;
+}
+
 /* ----------------------------------------------------- Gamification -------- */
 
 export interface GameState extends OwnedRecord {

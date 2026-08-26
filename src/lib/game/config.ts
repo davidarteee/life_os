@@ -29,6 +29,7 @@ export const DEFAULT_GAME_CONFIG: GameConfig = {
 export const XP_REASON = {
   habitComplete: "habit.complete",
   allHabitsBonus: "habit.allDailyBonus",
+  taskComplete: "task.complete",
   achievement: "achievement.unlock",
   challengeVerified: "challenge.verified",
   shopSpend: "shop.spend",
