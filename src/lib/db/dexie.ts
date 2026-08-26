@@ -81,3 +81,23 @@ export function db(): LifeOSDatabase {
   if (!_db) _db = new LifeOSDatabase();
   return _db;
 }
+
+/**
+ * Reliably wipe this device's local data: close the Dexie connection (so the
+ * IndexedDB delete isn't blocked), delete the database, and clear LifeOS's
+ * localStorage markers (bootstrap/adopted/lastPull/locale). Cloud data is
+ * untouched — on next load the device re-syncs a clean copy from the account.
+ */
+export async function resetLocalDatabase(): Promise<void> {
+  if (typeof window === "undefined") return;
+  const database = _db ?? new LifeOSDatabase();
+  await database.delete(); // Dexie closes the connection, then deletes the DB.
+  _db = null;
+  try {
+    Object.keys(localStorage)
+      .filter((k) => k.startsWith("lifeos"))
+      .forEach((k) => localStorage.removeItem(k));
+  } catch {
+    /* ignore storage access errors */
+  }
+}

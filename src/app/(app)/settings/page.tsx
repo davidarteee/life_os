@@ -15,6 +15,7 @@ import { useSettings } from "@/hooks/use-game";
 import { useLocaleStore } from "@/stores/locale-store";
 import { updateSettings } from "@/lib/data/settings";
 import { exportUserJSON, exportHabitsCSV, downloadFile } from "@/lib/data/export";
+import { resetLocalDatabase } from "@/lib/db/dexie";
 import { LOCALES } from "@/lib/i18n";
 import { isSupabaseConfigured } from "@/config/env";
 import type { GameConfig, Locale } from "@/lib/types";
@@ -188,13 +189,32 @@ export default function SettingsPage() {
             <CardTitle className="flex items-center gap-2 text-base"><Download className="size-4" /> {t("settings.yourData")}</CardTitle>
             <CardDescription>{t("settings.yourDataDesc")}</CardDescription>
           </CardHeader>
-          <CardContent className="flex flex-wrap gap-2">
-            <Button variant="outline" size="sm" onClick={async () => downloadFile(`lifeos-export-${Date.now()}.json`, await exportUserJSON(user.id))}>
-              {t("settings.exportJson")}
-            </Button>
-            <Button variant="outline" size="sm" onClick={async () => downloadFile(`lifeos-habits-${Date.now()}.csv`, await exportHabitsCSV(user.id), "text/csv")}>
-              {t("settings.exportCsv")}
-            </Button>
+          <CardContent className="flex flex-col gap-4">
+            <div className="flex flex-wrap gap-2">
+              <Button variant="outline" size="sm" onClick={async () => downloadFile(`lifeos-export-${Date.now()}.json`, await exportUserJSON(user.id))}>
+                {t("settings.exportJson")}
+              </Button>
+              <Button variant="outline" size="sm" onClick={async () => downloadFile(`lifeos-habits-${Date.now()}.csv`, await exportHabitsCSV(user.id), "text/csv")}>
+                {t("settings.exportCsv")}
+              </Button>
+            </div>
+            <div className="rounded-lg border border-destructive/30 bg-destructive/5 p-3">
+              <p className="text-sm font-medium">{t("settings.resetLocal")}</p>
+              <p className="mt-0.5 text-xs text-muted-foreground">{t("settings.resetLocalDesc")}</p>
+              <Button
+                variant="outline"
+                size="sm"
+                className="mt-2 text-destructive hover:text-destructive"
+                onClick={async () => {
+                  if (!window.confirm(t("settings.resetLocalConfirm"))) return;
+                  toast.success(t("settings.resetLocalDone"));
+                  await resetLocalDatabase();
+                  window.location.href = "/dashboard";
+                }}
+              >
+                {t("settings.resetLocal")}
+              </Button>
+            </div>
           </CardContent>
         </Card>
 
