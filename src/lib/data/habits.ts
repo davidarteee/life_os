@@ -40,11 +40,14 @@ export interface HabitInput {
   unit?: string;
   xpReward?: number;
   required?: boolean;
+  /** Optional explicit id — used only for deterministic seeding of defaults. */
+  id?: string;
 }
 
 export async function createHabit(userId: string, input: HabitInput): Promise<Habit> {
   const count = await db().habits.where("user_id").equals(userId).count();
   const habit = makeRecord<Habit>(userId, {
+    id: input.id,
     name: input.name.trim(),
     icon: input.icon ?? "CircleCheck",
     color: input.color ?? "health",

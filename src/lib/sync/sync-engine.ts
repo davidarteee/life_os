@@ -35,6 +35,20 @@ const REGISTRY: Record<SyncTable, TableBinding> = {
 
 const LAST_PULL_KEY = (userId: string) => `lifeos:lastPull:${userId}`;
 
+/**
+ * Last-write-wins conflict resolution (pure, unit-tested). A remote record is
+ * applied only when there is no local copy, or the remote copy is strictly
+ * newer by `updated_at`. Equal timestamps keep the local copy — this makes pull
+ * idempotent (re-pulling the same rows never rewrites them and never resurrects
+ * a locally-newer edit or delete).
+ */
+export function shouldApplyRemote(
+  local: { updated_at: string } | undefined | null,
+  remote: { updated_at: string },
+): boolean {
+  return !local || remote.updated_at > local.updated_at;
+}
+
 function toRow(record: OwnedRecord & { _dirty?: boolean }) {
   const { _dirty, ...clean } = record;
   void _dirty;
@@ -102,7 +116,7 @@ async function pull(supabase: SupabaseClient, userId: string): Promise<{ pulled:
       const remoteRecord = row.data as OwnedRecord;
       const local = await localTable.get(remoteRecord.id);
       // Last-write-wins: only overwrite if the remote copy is newer.
-      if (!local || remoteRecord.updated_at > local.updated_at) {
+      if (shouldApplyRemote(local, remoteRecord)) {
         await localTable.put({ ...remoteRecord, _dirty: false });
       }
       if (row.updated_at > maxSeen) maxSeen = row.updated_at;

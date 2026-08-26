@@ -2,6 +2,7 @@ import { db } from "@/lib/db/dexie";
 import { upsert, makeRecord } from "@/lib/data/repository";
 import type { UserSettings } from "@/lib/types";
 import { DEFAULT_GAME_CONFIG } from "@/lib/game/config";
+import { deterministicId } from "@/lib/id";
 
 const settingsOpts = (userId: string) => ({
   table: db().settings,
@@ -14,6 +15,7 @@ export function defaultSettings(userId: string): UserSettings {
   // row per user; it's always looked up by user_id, never by a derived id — a
   // non-UUID id would be rejected by the Supabase `id uuid` column and never sync.
   return makeRecord<UserSettings>(userId, {
+    id: deterministicId(`${userId}:user_settings`),
     locale: "es",
     currency: "EUR",
     heroMode: "auto",

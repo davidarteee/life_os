@@ -24,7 +24,7 @@ import { ACHIEVEMENTS_BY_ID } from "@/lib/game/achievements-def";
 import { CHALLENGES_BY_ID, type ChallengeDef } from "@/lib/game/challenges-def";
 import { XP_REASON } from "@/lib/game/config";
 import { listHabits, allLogs, isScheduledOn } from "@/lib/data/habits";
-import { newId } from "@/lib/id";
+import { newId, deterministicId } from "@/lib/id";
 
 const gs = (userId: string) => ({ table: db().gameState, syncTable: "game_state" as const, userId });
 const xp = (userId: string) => ({ table: db().xpEvents, syncTable: "xp_events" as const, userId });
@@ -43,9 +43,10 @@ export async function readGameState(userId: string): Promise<GameState | null> {
 export async function getGameState(userId: string): Promise<GameState> {
   const existing = await db().gameState.where("user_id").equals(userId).first();
   if (existing) return existing;
-  // id is a real UUID (one game-state row per user, looked up by user_id).
-  // A derived non-UUID id would be rejected by Supabase's `id uuid` column.
+  // Deterministic id (valid UUID format) so two devices creating the singleton
+  // before syncing produce the SAME id and merge instead of duplicating.
   const created = makeRecord<GameState>(userId, {
+    id: deterministicId(`${userId}:game_state`),
     xp: 0,
     spendableXp: 0,
     level: 1,

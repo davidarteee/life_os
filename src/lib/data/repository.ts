@@ -85,12 +85,15 @@ export async function softDelete<T extends OwnedRecord>(
 /** Build a fresh record shell with ids + timestamps filled in. */
 export function makeRecord<T extends OwnedRecord>(userId: string, partial: Omit<T, keyof OwnedRecord> & Partial<OwnedRecord>): T {
   const ts = nowISO();
+  // Spread `partial` FIRST, then apply the owned fields — so a caller passing an
+  // explicit `id: undefined` (e.g. an optional seed id) never clobbers the
+  // generated id. `id` falls back to a fresh UUID whenever it's not provided.
   return {
+    ...partial,
     id: partial.id ?? newId(),
     user_id: userId,
     created_at: partial.created_at ?? ts,
     updated_at: ts,
-    ...partial,
   } as T;
 }
 

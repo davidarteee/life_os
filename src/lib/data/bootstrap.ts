@@ -9,6 +9,7 @@ import type { Domain, OwnedRecord } from "@/lib/types";
 import { translate, type DictKey } from "@/lib/i18n";
 import { useLocaleStore } from "@/stores/locale-store";
 import { LOCAL_USER_ID } from "@/lib/constants";
+import { deterministicId } from "@/lib/id";
 
 /**
  * Default habits from the LifeOS spec. Seeded once for a new user in their
@@ -107,9 +108,15 @@ export async function ensureUserData(userId: string): Promise<void> {
 
   if (!marker) {
     // Brand-new account with no data anywhere: seed the localized defaults.
+    // Deterministic ids (userId + seed key) make seeding idempotent across
+    // devices — two devices that seed produce identical ids and merge.
     const locale = useLocaleStore.getState().locale;
     for (const h of DEFAULT_HABITS) {
-      await createHabit(userId, { ...h, name: translate(locale, h.nameKey) });
+      await createHabit(userId, {
+        ...h,
+        name: translate(locale, h.nameKey),
+        id: deterministicId(`${userId}:seed:${h.nameKey}`),
+      });
     }
     await recomputeAchievements(userId);
     setMarker();
