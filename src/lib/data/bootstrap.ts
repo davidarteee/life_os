@@ -1,8 +1,10 @@
 import type { Table } from "dexie";
 import { db } from "@/lib/db/dexie";
+import { activeRecords } from "@/lib/data/repository";
 import { createHabit, type HabitInput } from "@/lib/data/habits";
 import { getGameState, recomputeAchievements } from "@/lib/data/game";
 import { getSettings } from "@/lib/data/settings";
+import { runSync } from "@/lib/sync/sync-engine";
 import type { Domain, OwnedRecord } from "@/lib/types";
 import { translate, type DictKey } from "@/lib/i18n";
 import { useLocaleStore } from "@/stores/locale-store";
@@ -79,29 +81,38 @@ async function adoptLocalData(toUserId: string): Promise<boolean> {
  * DB check so it never double-seeds, even across reloads.
  */
 export async function ensureUserData(userId: string): Promise<void> {
-  // First cloud sign-in on a formerly-local device: migrate local data first,
-  // so the checks below see the adopted habits and skip re-seeding defaults.
-  const adopted = await adoptLocalData(userId);
+  // First cloud sign-in on a formerly-local device: migrate local data first.
+  await adoptLocalData(userId);
+
+  // Pull any existing cloud data for this account BEFORE deciding to seed, so a
+  // second device (or a returning user) doesn't duplicate the default habits.
+  // No-op in local/offline mode.
+  await runSync(userId).catch(() => {});
 
   const marker = typeof localStorage !== "undefined" ? localStorage.getItem(BOOTSTRAP_KEY(userId)) : null;
-  const habitCount = await db().habits.where("user_id").equals(userId).count();
+  const habitCount = activeRecords(await db().habits.where("user_id").equals(userId).toArray()).length;
 
   await getSettings(userId);
   await getGameState(userId);
 
-  if (adopted && typeof localStorage !== "undefined") {
-    localStorage.setItem(BOOTSTRAP_KEY(userId), new Date().toISOString());
+  const setMarker = () => {
+    if (typeof localStorage !== "undefined") localStorage.setItem(BOOTSTRAP_KEY(userId), new Date().toISOString());
+  };
+
+  if (habitCount > 0) {
+    // Account already has habits (adopted or pulled from the cloud) — don't seed.
+    if (!marker) setMarker();
+    return;
   }
 
-  if (!marker && !adopted && habitCount === 0) {
+  if (!marker) {
+    // Brand-new account with no data anywhere: seed the localized defaults.
     const locale = useLocaleStore.getState().locale;
     for (const h of DEFAULT_HABITS) {
       await createHabit(userId, { ...h, name: translate(locale, h.nameKey) });
     }
     await recomputeAchievements(userId);
-    if (typeof localStorage !== "undefined") {
-      localStorage.setItem(BOOTSTRAP_KEY(userId), new Date().toISOString());
-    }
+    setMarker();
   }
 }
 

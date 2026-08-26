@@ -10,8 +10,10 @@ const settingsOpts = (userId: string) => ({
 });
 
 export function defaultSettings(userId: string): UserSettings {
+  // id is a real UUID (makeRecord generates one). There's exactly one settings
+  // row per user; it's always looked up by user_id, never by a derived id — a
+  // non-UUID id would be rejected by the Supabase `id uuid` column and never sync.
   return makeRecord<UserSettings>(userId, {
-    id: `settings-${userId}`,
     locale: "es",
     currency: "EUR",
     heroMode: "auto",

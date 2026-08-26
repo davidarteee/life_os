@@ -43,8 +43,9 @@ export async function readGameState(userId: string): Promise<GameState | null> {
 export async function getGameState(userId: string): Promise<GameState> {
   const existing = await db().gameState.where("user_id").equals(userId).first();
   if (existing) return existing;
+  // id is a real UUID (one game-state row per user, looked up by user_id).
+  // A derived non-UUID id would be rejected by Supabase's `id uuid` column.
   const created = makeRecord<GameState>(userId, {
-    id: `game-${userId}`,
     xp: 0,
     spendableXp: 0,
     level: 1,
