@@ -16,10 +16,12 @@ Cinematic hero, customizable widget grid (drag / resize / hide / restore, per‑
 ## Phase 3 — Core
 - **Habits** ✅ — CRUD, cadence, targets, streaks, monthly history, stats.
 - **Gamification** ✅ — XP ledger + scaling levels, 3 lives, free days (scheduled + purchased), XP shop, achievements (categories, hidden/locked), **challenge roulette** + **evidence verification**, testing tools.
-- Tasks 🟡 · Projects 🟡 · Calendar 🟡⛳ (Apple Calendar via ICS/CalDAV) · Notes 🟡 · Goals/Vision 🟡
+- **Tasks** ✅ — inbox/backlog, today+overdue, per‑day scheduling, priorities, dnd reorder, search/filter, priority‑based XP + task achievements.
+- **Calendar** ✅ — one unified month view aggregating dated items from modules via a provider registry (`src/lib/calendar/calendar.ts`); interactive selected‑day panel. Apple Calendar sync ⛳ deferred.
+- Projects 🟡 · Notes 🟡 · Goals/Vision 🟡
 
 ## Phase 4 — Health
-Nutrition 🟡 · Workouts 🟡 · Sleep 🟡⛳ (Suunto import) · Body tracking 🟡. Exercise → calorie balance ⛳ (Strava/Suunto official APIs + manual/CSV fallback).
+Nutrition 🚧 · Workouts 🚧 — **in progress** on branch `wip/nutrition-exercise` (data‑layer scaffold only, does NOT build; see `docs/handoff/`). Sleep 🟡⛳ (Suunto import) · Body tracking 🟡. Exercise → calorie balance ⛳ (Strava/Suunto official APIs + manual/CSV fallback).
 
 ## Phase 5 — Finance
 Investments 🟡⛳ (market‑data provider behind an abstraction; **manual + CSV** transaction entry — no unofficial broker APIs) · Personal finance 🟡.

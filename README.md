@@ -8,7 +8,9 @@ A personal operating system for habits, health, finance, goals, learning and gro
 
 ## Status
 
-This repository is a **solid, production‑shaped foundation** plus **one complete vertical module** (Habits + Gamification) built end‑to‑end. Every other module has a real page inside the same shell, clearly marked _Coming soon_, ready to be filled in against the established architecture and design system. See [docs/ROADMAP.md](docs/ROADMAP.md).
+This repository is a **solid, production‑shaped foundation** plus **three complete vertical modules** — **Habits + Gamification**, **Tasks**, and a unified **Calendar** — built end‑to‑end, deployed to Vercel, and synced to Supabase (multi‑device validated). **Nutrition + Exercise** is the next module (in progress). Every other module has a real page inside the same shell, clearly marked _Coming soon_. See [docs/ROADMAP.md](docs/ROADMAP.md).
+
+> **Continuing development?** Start with [docs/handoff/SESSION_HANDOFF.md](docs/handoff/SESSION_HANDOFF.md), then the rest of [docs/handoff/](docs/handoff/).
 
 **Done and working today**
 - Next.js (App Router) + TypeScript + Tailwind v4 + shadcn/ui design system (dark‑first, light‑ready).
@@ -19,7 +21,9 @@ This repository is a **solid, production‑shaped foundation** plus **one comple
 - **PWA**: manifest, service worker, offline page, installable.
 - **Habits**: CRUD, cadence, targets, streaks, monthly history, stats.
 - **Gamification**: XP ledger, scaling level curve, 3‑lives system, scheduled + purchased free days, XP shop, achievements (categories, hidden/locked), and the **0‑lives challenge roulette** with **evidence‑verified** life restoration.
-- i18n (English / Español / Català), data export (JSON + CSV), unit tests for the game rules.
+- **Tasks**: inbox/backlog, Today + overdue, per‑day scheduling, priorities, dnd reorder, search/filter, priority‑based XP + task achievements.
+- **Calendar**: one unified month view aggregating dated items from modules (provider registry), interactive selected‑day panel.
+- i18n (**Español** default / English / Català), data export (JSON + CSV), unit + sync/idempotency tests (57 passing).
 
 ---
 
