@@ -63,26 +63,26 @@ export function MacroRings({ totals, targets }: { totals: Macros; targets: Nutri
   const macros = MACRO_META.slice(1);
 
   return (
-    <div className="flex flex-col items-center gap-5 sm:flex-row sm:items-center sm:gap-7">
+    <div className="flex w-full flex-col items-center gap-6">
       {/* Hero calories ring */}
-      <MacroRing value={totals.calories} target={targets.calories} color={cal.color} size={132} stroke={11}>
+      <MacroRing value={totals.calories} target={targets.calories} color={cal.color} size={150} stroke={12}>
         <div>
-          <p className="font-heading text-2xl font-bold tabular-nums">{Math.round(totals.calories)}</p>
+          <p className="font-heading text-3xl font-bold tabular-nums">{Math.round(totals.calories)}</p>
           <p className="text-[11px] text-muted-foreground">/ {targets.calories} {t("nutrition.kcal")}</p>
           <p className="mt-0.5 text-[10px] font-medium tabular-nums text-muted-foreground">{pct(totals.calories, targets.calories)}%</p>
         </div>
       </MacroRing>
 
       {/* Macro rings */}
-      <div className="grid grid-cols-3 gap-4">
+      <div className="grid w-full grid-cols-3 gap-3">
         {macros.map((m) => {
           const value = totals[m.key as MacroKey];
           const target = targets[m.key as MacroKey];
           return (
             <div key={m.key} className="flex flex-col items-center gap-1.5">
-              <MacroRing value={value} target={target} color={m.color} size={78} stroke={7}>
+              <MacroRing value={value} target={target} color={m.color} size={88} stroke={8}>
                 <div>
-                  <p className="font-heading text-sm font-bold tabular-nums">{Math.round(value)}</p>
+                  <p className="font-heading text-base font-bold tabular-nums">{Math.round(value)}</p>
                   <p className="text-[9px] text-muted-foreground">/{Math.round(target)}g</p>
                 </div>
               </MacroRing>

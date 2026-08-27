@@ -56,7 +56,7 @@ export default function NutritionPage() {
         </Button>
       </div>
 
-      <div className="grid gap-5 lg:grid-cols-[1fr_360px]">
+      <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_400px]">
         {/* Left: meals */}
         <div className="order-2 flex flex-col gap-3 lg:order-1">
           {MEAL_SLOTS.map((meal) => (

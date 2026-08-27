@@ -53,6 +53,42 @@ export function shouldApplyRemote(
   return !local || remote.updated_at > local.updated_at;
 }
 
+/**
+ * How far back each pull re-scans below the stored high-water-mark. Peers stamp
+ * new rows with their own (client) clock, while a device's mark can be nudged
+ * ahead by the server's `updated_at` trigger on updates. Without an overlap a
+ * device can permanently skip a peer's slightly-older-stamped inserts (the
+ * cross-device "nothing syncs" bug). Re-pulling this window every cycle is safe
+ * — pull is idempotent (last-write-wins; equal timestamps keep the local copy).
+ */
+export const PULL_OVERLAP_MS = 5 * 60_000;
+
+const EPOCH = "1970-01-01T00:00:00.000Z";
+
+/**
+ * Query lower bound (exclusive) for a pull: the high-water-mark minus the
+ * overlap. An unset or unparseable mark means a full re-pull from the epoch.
+ */
+export function pullWindowStart(since: string | null): string {
+  const base = since ? Date.parse(since) : NaN;
+  if (!Number.isFinite(base)) return EPOCH;
+  return new Date(Math.max(0, base - PULL_OVERLAP_MS)).toISOString();
+}
+
+/**
+ * A stored high-water-mark beyond `now` is poisoned (a row stamped with a
+ * far-future client clock) and would freeze all future pulls. Treat it as unset
+ * so the next pull does a full, self-healing re-scan.
+ */
+export function healHighWater(since: string | null, nowISO: string): string | null {
+  return since && since > nowISO ? null : since;
+}
+
+/** Never persist a high-water-mark past `now`, so one future-stamped row can't block later pulls. */
+export function boundHighWater(maxSeen: string, nowISO: string): string {
+  return maxSeen > nowISO ? nowISO : maxSeen;
+}
+
 function toRow(record: OwnedRecord & { _dirty?: boolean }) {
   const { _dirty, ...clean } = record;
   void _dirty;
@@ -95,11 +131,17 @@ async function push(supabase: SupabaseClient, userId: string): Promise<{ pushed:
 
 /** Pull remote rows updated since the last successful pull and merge them in. */
 async function pull(supabase: SupabaseClient, userId: string): Promise<{ pulled: number; errors: number }> {
-  const since = typeof localStorage !== "undefined" ? localStorage.getItem(LAST_PULL_KEY(userId)) : null;
-  const cutoff = since ?? "1970-01-01T00:00:00.000Z";
+  const nowISO = new Date().toISOString();
+  const stored = typeof localStorage !== "undefined" ? localStorage.getItem(LAST_PULL_KEY(userId)) : null;
+  // Heal a poisoned (future) mark → full re-pull; otherwise re-scan a small
+  // overlap below the mark so peer inserts stamped with a slightly-behind clock
+  // are never permanently skipped.
+  const since = healHighWater(stored, nowISO);
+  const wasPoisoned = since !== stored;
+  const cutoff = pullWindowStart(since);
   let pulled = 0;
   let errors = 0;
-  let maxSeen = cutoff;
+  let maxSeen = since ?? EPOCH;
 
   for (const table of Object.keys(REGISTRY) as SyncTable[]) {
     const binding = REGISTRY[table];
@@ -128,8 +170,12 @@ async function pull(supabase: SupabaseClient, userId: string): Promise<{ pulled:
     }
   }
 
-  if (typeof localStorage !== "undefined" && maxSeen > cutoff) {
-    localStorage.setItem(LAST_PULL_KEY(userId), maxSeen);
+  if (typeof localStorage !== "undefined") {
+    const next = boundHighWater(maxSeen, new Date().toISOString());
+    // Persist when we advanced, or when healing a poisoned mark back to a sane value.
+    if (wasPoisoned || next > (stored ?? "")) {
+      localStorage.setItem(LAST_PULL_KEY(userId), next);
+    }
   }
   return { pulled, errors };
 }
