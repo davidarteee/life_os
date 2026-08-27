@@ -4,6 +4,7 @@ import { activeRecords } from "@/lib/data/repository";
 import { advanceHabit, listHabits, logsForDay, isScheduledOn } from "@/lib/data/habits";
 import { toggleTask, taskXp } from "@/lib/data/tasks";
 import { awardXp, recomputeAchievements, type AchievementUnlock } from "@/lib/data/game";
+import { dayTotals, getNutritionConfig, targetsMet } from "@/lib/data/nutrition";
 import { XP_REASON } from "@/lib/game/config";
 import { dayKey, weekdayIndex, fromDayKey } from "@/lib/date";
 
@@ -102,4 +103,48 @@ export async function toggleTaskAction(
 
   const unlocks = await recomputeAchievements(userId);
   return { becameDone, becameTodo, xpDelta, unlocks };
+}
+
+/** Net nutrition-target bonus already applied for a day (append-only ledger). */
+async function netNutritionBonus(userId: string, day: DayKey): Promise<number> {
+  const events = activeRecords(await db().xpEvents.where("[user_id+day]").equals([userId, day]).toArray());
+  return events
+    .filter((e) => e.reason === XP_REASON.nutritionTarget)
+    .reduce((sum, e) => sum + e.amount, 0);
+}
+
+export interface NutritionReconcileOutcome {
+  targetsMet: boolean;
+  xpDelta: number;
+  unlocks: AchievementUnlock[];
+}
+
+/**
+ * Reconcile the once-per-day "nutrition targets met" XP after any change to a
+ * day's food log. Mirrors the all-habits bonus: awards `nutritionTarget` XP the
+ * first time the day's totals hit the targets and reverses it if a later edit
+ * drops the day back below them — so the ledger is always idempotent and the XP
+ * never double-counts. Exercise never earns XP here (a "do sport" habit does).
+ */
+export async function reconcileNutrition(
+  userId: string,
+  day: DayKey,
+  config: GameConfig,
+): Promise<NutritionReconcileOutcome> {
+  const nutrition = await getNutritionConfig(userId);
+  const totals = await dayTotals(userId, day);
+  const met = targetsMet(totals, nutrition.targets);
+  const active = (await netNutritionBonus(userId, day)) > 0;
+
+  let xpDelta = 0;
+  if (met && !active) {
+    await awardXp(userId, config.xp.nutritionTarget, XP_REASON.nutritionTarget, { day });
+    xpDelta = config.xp.nutritionTarget;
+  } else if (!met && active) {
+    await awardXp(userId, -config.xp.nutritionTarget, XP_REASON.nutritionTarget, { day, meta: { reverse: true } });
+    xpDelta = -config.xp.nutritionTarget;
+  }
+
+  const unlocks = await recomputeAchievements(userId);
+  return { targetsMet: met, xpDelta, unlocks };
 }

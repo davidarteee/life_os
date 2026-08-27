@@ -11,6 +11,7 @@ import type {
   GameConfig,
   ShopItemId,
   FreeDayKind,
+  Macros,
 } from "@/lib/types";
 import { dayKey, shiftDayKey, fromDayKey } from "@/lib/date";
 import { levelProgress } from "@/lib/game/xp";
@@ -24,6 +25,8 @@ import { ACHIEVEMENTS_BY_ID } from "@/lib/game/achievements-def";
 import { CHALLENGES_BY_ID, type ChallengeDef } from "@/lib/game/challenges-def";
 import { XP_REASON } from "@/lib/game/config";
 import { listHabits, allLogs, isScheduledOn } from "@/lib/data/habits";
+import { getNutritionConfig, targetsMet } from "@/lib/data/nutrition";
+import { sumMacros } from "@/lib/nutrition/macros";
 import { newId, deterministicId } from "@/lib/id";
 
 const gs = (userId: string) => ({ table: db().gameState, syncTable: "game_state" as const, userId });
@@ -344,11 +347,27 @@ export async function computeCounters(userId: string): Promise<AchievementCounte
     (t) => t.status === "done",
   ).length;
 
+  // Nutrition: distinct days with any logged food, and days that met the targets.
+  const foodEntries = activeRecords(await db().foodEntries.where("user_id").equals(userId).toArray());
+  const entriesByDay = new Map<string, Macros[]>();
+  for (const e of foodEntries) {
+    if (!entriesByDay.has(e.day)) entriesByDay.set(e.day, []);
+    entriesByDay.get(e.day)!.push(e);
+  }
+  const nutritionDaysLogged = entriesByDay.size;
+  const nutritionConfig = await getNutritionConfig(userId);
+  let nutritionTargetsHit = 0;
+  for (const rows of entriesByDay.values()) {
+    if (targetsMet(sumMacros(rows), nutritionConfig.targets)) nutritionTargetsHit += 1;
+  }
+
   return {
     habitsCompleted,
     habitStreak,
     perfectDays,
     tasksCompleted,
+    nutritionDaysLogged,
+    nutritionTargetsHit,
     level: state.level,
     challengesVerified: challenges.filter((c) => c.status === "verified").length,
     xpTotal: state.xp,

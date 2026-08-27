@@ -16,6 +16,8 @@ interface AchTemplates {
   firstStep: Loc;
   habitsDone: (n: number) => Loc;
   tasksDone: (n: number) => Loc;
+  nutritionLogged: (n: number) => Loc;
+  nutritionTargets: (n: number) => Loc;
   streak: (n: number) => Loc;
   perfectDay: Loc;
   perfectDays: (n: number) => Loc;
@@ -32,6 +34,8 @@ const ACH: Record<Locale, AchTemplates> = {
     firstStep: { title: "First Step", description: "Complete 1 habit in total." },
     habitsDone: (n) => ({ title: `${n} Habits Done`, description: `Complete ${n} habits in total.` }),
     tasksDone: (n) => ({ title: `${n} Tasks Done`, description: `Complete ${n} tasks in total.` }),
+    nutritionLogged: (n) => ({ title: `${n} Days Logged`, description: `Log your food on ${n} day${n > 1 ? "s" : ""}.` }),
+    nutritionTargets: (n) => ({ title: `${n} On-target Days`, description: `Hit your nutrition targets on ${n} day${n > 1 ? "s" : ""}.` }),
     streak: (n) => ({ title: `${n}-Day Streak`, description: `Keep any habit alive for ${n} days straight.` }),
     perfectDay: { title: "Perfect Day", description: "Complete every required habit on 1 day." },
     perfectDays: (n) => ({ title: `${n} Perfect Days`, description: `Complete every required habit on ${n} days.` }),
@@ -46,6 +50,8 @@ const ACH: Record<Locale, AchTemplates> = {
     firstStep: { title: "Primer paso", description: "Completa 1 hábito en total." },
     habitsDone: (n) => ({ title: `${n} hábitos completados`, description: `Completa ${n} hábitos en total.` }),
     tasksDone: (n) => ({ title: `${n} tareas completadas`, description: `Completa ${n} tareas en total.` }),
+    nutritionLogged: (n) => ({ title: `${n} días registrados`, description: `Registra tu comida ${n} día${n > 1 ? "s" : ""}.` }),
+    nutritionTargets: (n) => ({ title: `${n} días en objetivo`, description: `Alcanza tus objetivos nutricionales ${n} día${n > 1 ? "s" : ""}.` }),
     streak: (n) => ({ title: `Racha de ${n} días`, description: `Mantén cualquier hábito ${n} días seguidos.` }),
     perfectDay: { title: "Día perfecto", description: "Completa todos los hábitos obligatorios en 1 día." },
     perfectDays: (n) => ({ title: `${n} días perfectos`, description: `Completa todos los hábitos obligatorios en ${n} días.` }),
@@ -60,6 +66,8 @@ const ACH: Record<Locale, AchTemplates> = {
     firstStep: { title: "Primer pas", description: "Completa 1 hàbit en total." },
     habitsDone: (n) => ({ title: `${n} hàbits completats`, description: `Completa ${n} hàbits en total.` }),
     tasksDone: (n) => ({ title: `${n} tasques completades`, description: `Completa ${n} tasques en total.` }),
+    nutritionLogged: (n) => ({ title: `${n} dies registrats`, description: `Registra el teu menjar ${n} dia${n > 1 ? "es" : ""}.` }),
+    nutritionTargets: (n) => ({ title: `${n} dies dins l'objectiu`, description: `Assoleix els teus objectius nutricionals ${n} dia${n > 1 ? "es" : ""}.` }),
     streak: (n) => ({ title: `Ratxa de ${n} dies`, description: `Mantén qualsevol hàbit ${n} dies seguits.` }),
     perfectDay: { title: "Dia perfecte", description: "Completa tots els hàbits obligatoris en 1 dia." },
     perfectDays: (n) => ({ title: `${n} dies perfectes`, description: `Completa tots els hàbits obligatoris en ${n} dies.` }),
@@ -80,6 +88,8 @@ export function describeAchievement(locale: Locale, def: AchievementDefEx): Loc 
   if (id === "hidden_ironwill") return tpl.ironwill;
   if (id.startsWith("habits_done_")) return goal === 1 ? tpl.firstStep : tpl.habitsDone(goal);
   if (id.startsWith("tasks_done_")) return tpl.tasksDone(goal);
+  if (id.startsWith("nutrition_logged_")) return tpl.nutritionLogged(goal);
+  if (id.startsWith("nutrition_target_")) return tpl.nutritionTargets(goal);
   if (id.startsWith("habit_streak_")) return tpl.streak(goal);
   if (id.startsWith("perfect_days_")) return goal === 1 ? tpl.perfectDay : tpl.perfectDays(goal);
   if (id.startsWith("level_")) return tpl.level(goal);

@@ -41,8 +41,8 @@ export const NAV: NavSection[] = [
     labelKey: "nav.section.health",
     items: [
       { href: "/habits", labelKey: "nav.habits", icon: CircleCheckBig, ready: true },
-      { href: "/nutrition", labelKey: "nav.nutrition", icon: Apple },
-      { href: "/workouts", labelKey: "nav.workouts", icon: Dumbbell },
+      { href: "/nutrition", labelKey: "nav.nutrition", icon: Apple, ready: true },
+      { href: "/workouts", labelKey: "nav.workouts", icon: Dumbbell, ready: true },
       { href: "/sleep", labelKey: "nav.sleep", icon: Moon },
     ],
   },

@@ -19,6 +19,8 @@ export type WidgetId =
   | "quick-note"
   | "pomodoro"
   | "month-overview"
+  | "nutrition-summary"
+  | "exercise-summary"
   | "coming-soon-health"
   | "coming-soon-finance";
 
@@ -45,6 +47,8 @@ export const WIDGETS: WidgetMeta[] = [
   { id: "quick-note", title: "Quick note", span: 4, minSpan: 3, maxSpan: 6, resizable: true },
   { id: "pomodoro", title: "Pomodoro", span: 4, minSpan: 3, maxSpan: 6, resizable: true },
   { id: "month-overview", title: "This month", span: 6, minSpan: 4, maxSpan: 12, resizable: true },
+  { id: "nutrition-summary", title: "Nutrition", span: 4, minSpan: 3, maxSpan: 6, resizable: true },
+  { id: "exercise-summary", title: "Exercise", span: 4, minSpan: 3, maxSpan: 6, resizable: true },
   { id: "coming-soon-health", title: "Health", span: 3, minSpan: 3, maxSpan: 6, resizable: true },
   { id: "coming-soon-finance", title: "Finance", span: 3, minSpan: 3, maxSpan: 6, resizable: true },
 ];
@@ -64,7 +68,8 @@ export const DEFAULT_WIDGET_ORDER: WidgetId[] = [
   "achievements-preview",
   "quick-note",
   "pomodoro",
+  "nutrition-summary",
+  "exercise-summary",
   "month-overview",
-  "coming-soon-health",
   "coming-soon-finance",
 ];

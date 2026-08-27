@@ -2,6 +2,7 @@ import { db } from "@/lib/db/dexie";
 import { upsert, makeRecord } from "@/lib/data/repository";
 import type { UserSettings } from "@/lib/types";
 import { DEFAULT_GAME_CONFIG } from "@/lib/game/config";
+import { DEFAULT_NUTRITION_CONFIG } from "@/lib/nutrition/config";
 import { deterministicId } from "@/lib/id";
 
 const settingsOpts = (userId: string) => ({
@@ -20,6 +21,7 @@ export function defaultSettings(userId: string): UserSettings {
     currency: "EUR",
     heroMode: "auto",
     game: structuredClone(DEFAULT_GAME_CONFIG),
+    nutrition: structuredClone(DEFAULT_NUTRITION_CONFIG),
   });
 }
 

@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Settings as SettingsIcon, Globe, Coins, Palette, Gamepad2, Download, Plug, Save } from "lucide-react";
+import { Settings as SettingsIcon, Globe, Coins, Palette, Gamepad2, Download, Plug, Save, Apple } from "lucide-react";
 import { PageContainer, PageHeader } from "@/components/layout/page-container";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -18,8 +18,10 @@ import { exportUserJSON, exportHabitsCSV, downloadFile } from "@/lib/data/export
 import { resetLocalDatabase } from "@/lib/db/dexie";
 import { LOCALES } from "@/lib/i18n";
 import { isSupabaseConfigured } from "@/config/env";
-import type { GameConfig, Locale } from "@/lib/types";
+import { DEFAULT_NUTRITION_CONFIG } from "@/lib/nutrition/config";
+import type { GameConfig, Locale, NutritionConfig } from "@/lib/types";
 import { useT } from "@/hooks/use-t";
+import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 
 const CURRENCIES = ["EUR", "USD", "GBP", "CHF", "JPY"];
@@ -31,12 +33,15 @@ export default function SettingsPage() {
   const setLocale = useLocaleStore((s) => s.setLocale);
   const { theme, setTheme } = useTheme();
   const [game, setGame] = useState<GameConfig | null>(null);
+  const [nutrition, setNutrition] = useState<NutritionConfig | null>(null);
 
   useEffect(() => {
-    if (settings) setGame(settings.game);
+    if (!settings) return;
+    setGame(settings.game);
+    setNutrition(settings.nutrition ?? structuredClone(DEFAULT_NUTRITION_CONFIG));
   }, [settings]);
 
-  if (!user || !settings || !game) return <PageContainer><div className="h-40" /></PageContainer>;
+  if (!user || !settings || !game || !nutrition) return <PageContainer><div className="h-40" /></PageContainer>;
 
   async function patch(p: Parameters<typeof updateSettings>[1]) {
     if (!user) return;
@@ -48,6 +53,23 @@ export default function SettingsPage() {
     await patch({ game });
     toast.success(t("settings.saved"));
   }
+
+  async function saveNutrition() {
+    if (!nutrition) return;
+    await patch({ nutrition });
+    toast.success(t("settings.saved"));
+  }
+
+  const nnum = (path: (n: NutritionConfig) => number, set: (n: NutritionConfig, v: number) => NutritionConfig, label: string) => (
+    <div className="grid gap-1.5">
+      <Label className="text-xs text-muted-foreground">{label}</Label>
+      <Input
+        type="number"
+        value={path(nutrition!)}
+        onChange={(e) => setNutrition((n) => (n ? set(structuredClone(n), Number(e.target.value)) : n))}
+      />
+    </div>
+  );
 
   const num = (path: (g: GameConfig) => number, set: (g: GameConfig, v: number) => GameConfig, label: string) => (
     <div className="grid gap-1.5">
@@ -178,6 +200,58 @@ export default function SettingsPage() {
                 {num((g) => g.shop.extra_life, (g, v) => ({ ...g, shop: { ...g.shop, extra_life: v } }), t("shop.extraLife"))}
                 {num((g) => g.shop.free_day, (g, v) => ({ ...g, shop: { ...g.shop, free_day: v } }), t("shop.freeDay"))}
                 {num((g) => g.shop.streak_shield, (g, v) => ({ ...g, shop: { ...g.shop, streak_shield: v } }), t("shop.streakShield"))}
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Nutrition */}
+        <Card>
+          <CardHeader className="flex-row items-center justify-between pb-3">
+            <CardTitle className="flex items-center gap-2 text-base"><Apple className="size-4" /> {t("settings.nutrition")}</CardTitle>
+            <Button size="sm" onClick={saveNutrition} className="gap-1.5"><Save className="size-4" /> {t("common.save")}</Button>
+          </CardHeader>
+          <CardContent className="flex flex-col gap-5">
+            <div>
+              <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">{t("settings.nutritionTargets")}</p>
+              <div className="grid gap-3 sm:grid-cols-4">
+                {nnum((n) => n.targets.calories, (n, v) => ({ ...n, targets: { ...n.targets, calories: v } }), t("nutrition.calories"))}
+                {nnum((n) => n.targets.protein, (n, v) => ({ ...n, targets: { ...n.targets, protein: v } }), t("nutrition.protein"))}
+                {nnum((n) => n.targets.carbs, (n, v) => ({ ...n, targets: { ...n.targets, carbs: v } }), t("nutrition.carbs"))}
+                {nnum((n) => n.targets.fat, (n, v) => ({ ...n, targets: { ...n.targets, fat: v } }), t("nutrition.fat"))}
+              </div>
+            </div>
+            <div>
+              <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">{t("settings.energyBalance")}</p>
+              <div className="flex flex-col gap-3">
+                <div className="grid gap-2 sm:grid-cols-2">
+                  {(["informational", "adjustTarget"] as const).map((mode) => (
+                    <button
+                      key={mode}
+                      onClick={() => setNutrition((n) => (n ? { ...n, energyMode: mode } : n))}
+                      className={cn(
+                        "rounded-xl border p-3 text-left transition-colors",
+                        nutrition.energyMode === mode ? "border-health bg-health/10" : "border-border/60 hover:bg-muted",
+                      )}
+                    >
+                      <p className="text-sm font-medium">{mode === "informational" ? t("settings.energyInformational") : t("settings.energyAdjust")}</p>
+                      <p className="mt-0.5 text-[11px] text-muted-foreground">{mode === "informational" ? t("settings.energyInformationalDesc") : t("settings.energyAdjustDesc")}</p>
+                    </button>
+                  ))}
+                </div>
+                {nutrition.energyMode === "adjustTarget" && (
+                  <div className="grid gap-1.5 sm:max-w-[200px]">
+                    <Label className="text-xs text-muted-foreground">{t("settings.exerciseFactor")}</Label>
+                    <Input
+                      type="number"
+                      step="0.1"
+                      min={0}
+                      max={1}
+                      value={nutrition.exerciseFactor}
+                      onChange={(e) => setNutrition((n) => (n ? { ...n, exerciseFactor: Math.max(0, Math.min(1, Number(e.target.value))) } : n))}
+                    />
+                  </div>
+                )}
               </div>
             </div>
           </CardContent>

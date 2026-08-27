@@ -30,6 +30,7 @@ export const XP_REASON = {
   habitComplete: "habit.complete",
   allHabitsBonus: "habit.allDailyBonus",
   taskComplete: "task.complete",
+  nutritionTarget: "nutrition.target",
   achievement: "achievement.unlock",
   challengeVerified: "challenge.verified",
   shopSpend: "shop.spend",

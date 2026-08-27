@@ -81,6 +81,77 @@ export interface Task extends OwnedRecord {
   order: number;
 }
 
+/* ------------------------------------------------------------ Nutrition -- */
+
+export type MealSlot = "breakfast" | "midmorning" | "lunch" | "snack" | "dinner";
+export const MEAL_SLOTS: MealSlot[] = ["breakfast", "midmorning", "lunch", "snack", "dinner"];
+
+/** The four tracked macronutrient/energy values. */
+export interface Macros {
+  calories: number;
+  protein: number;
+  carbs: number;
+  fat: number;
+}
+
+/**
+ * A reusable food the user created. Macros are expressed PER `per` `unit`
+ * (e.g. per 100 g), so logging any quantity scales them. Built-in common foods
+ * live in code (see lib/nutrition/foods-catalog) — this table is the user's own.
+ */
+export interface Food extends OwnedRecord, Macros {
+  name: string;
+  brand?: string;
+  per: number; // reference amount the macros are given for (e.g. 100)
+  unit: string; // "g" | "ml" | "unit"
+  favorite: boolean;
+  useCount: number; // surfaces frequently-used foods
+}
+
+/**
+ * A food logged into a meal on a day. Its macros are a SNAPSHOT of the consumed
+ * amount, so editing/deleting the source Food never rewrites diary history.
+ */
+export interface FoodEntry extends OwnedRecord, Macros {
+  day: DayKey;
+  meal: MealSlot;
+  foodId?: string; // origin food (catalog:<id> or a user Food id) for reuse/frequency
+  name: string;
+  quantity: number;
+  unit: string;
+}
+
+/* ------------------------------------------------------------- Exercise -- */
+
+export type WorkoutSource = "manual" | "strava" | "suunto";
+
+export interface Workout extends OwnedRecord {
+  day: DayKey;
+  activity: string; // preset key or free text
+  durationMin?: number;
+  distanceKm?: number;
+  calories?: number; // energy burned
+  notes?: string;
+  source: WorkoutSource;
+  externalId?: string; // stable id from an external provider (dedup on import)
+}
+
+/* --------------------------------------------- Nutrition configuration ---- */
+
+export type NutritionTargets = Macros;
+export type EnergyMode = "informational" | "adjustTarget";
+
+export interface NutritionConfig {
+  targets: NutritionTargets;
+  /**
+   * How exercise relates to the calorie target. `informational` (default) never
+   * changes the target — it only shows burned/net. `adjustTarget` adds
+   * burned × exerciseFactor to the effective target, transparently.
+   */
+  energyMode: EnergyMode;
+  exerciseFactor: number; // 0..1
+}
+
 /* ----------------------------------------------------- Gamification -------- */
 
 export interface GameState extends OwnedRecord {
@@ -203,4 +274,5 @@ export interface UserSettings extends OwnedRecord {
   heroMode: "auto" | "custom";
   heroImageUrl?: string;
   game: GameConfig;
+  nutrition: NutritionConfig;
 }

@@ -12,6 +12,7 @@ import { PomodoroWidget } from "@/components/dashboard/widgets/pomodoro";
 import { MonthOverviewWidget } from "@/components/dashboard/widgets/month-overview";
 import { StreaksWidget, LivesWidget, ComingSoonMini } from "@/components/dashboard/widgets/small-widgets";
 import { TodayTasksWidget, TaskInboxWidget, MiniCalendarWidget } from "@/components/dashboard/widgets/task-widgets";
+import { NutritionSummaryWidget, ExerciseSummaryWidget } from "@/components/dashboard/widgets/health-widgets";
 import { useT } from "@/hooks/use-t";
 
 function XpProgressWidget() {
@@ -48,6 +49,10 @@ export function WidgetContent({ id }: { id: WidgetId }) {
       return <PomodoroWidget />;
     case "month-overview":
       return <MonthOverviewWidget />;
+    case "nutrition-summary":
+      return <NutritionSummaryWidget />;
+    case "exercise-summary":
+      return <ExerciseSummaryWidget />;
     case "coming-soon-health":
       return <ComingSoonMini href="/nutrition" label={t("widget.coming-soon-health")} icon={Apple} color="health" />;
     case "coming-soon-finance":

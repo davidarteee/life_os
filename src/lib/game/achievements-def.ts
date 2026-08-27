@@ -15,6 +15,8 @@ export type AchievementMetric =
   | "habitStreak" // best current streak across habits
   | "perfectDays" // days where all required habits done
   | "tasksCompleted" // lifetime completed tasks
+  | "nutritionDaysLogged" // distinct days with at least one food logged
+  | "nutritionTargetsHit" // distinct days the nutrition targets were met
   | "level"
   | "challengesVerified"
   | "xpTotal"
@@ -95,6 +97,28 @@ export const ACHIEVEMENTS: AchievementDefEx[] = [
     label: (n) => ({
       title: `${n} Tasks Done`,
       description: `Complete ${n} tasks in total.`,
+    }),
+  }),
+  ...milestones({
+    prefix: "nutrition_logged",
+    category: "health",
+    icon: "Apple",
+    metric: "nutritionDaysLogged",
+    steps: [1, 7, 30, 100],
+    label: (n) => ({
+      title: `${n} Days Logged`,
+      description: `Log your food on ${n} day${n > 1 ? "s" : ""}.`,
+    }),
+  }),
+  ...milestones({
+    prefix: "nutrition_target",
+    category: "health",
+    icon: "Salad",
+    metric: "nutritionTargetsHit",
+    steps: [1, 7, 30],
+    label: (n) => ({
+      title: `${n} On-target Days`,
+      description: `Hit your nutrition targets on ${n} day${n > 1 ? "s" : ""}.`,
     }),
   }),
   ...milestones({

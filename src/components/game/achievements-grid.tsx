@@ -2,7 +2,7 @@
 
 import type { LucideIcon } from "lucide-react";
 import {
-  CircleCheckBig, Flame, Sparkles, TrendingUp, Zap, Trophy, Bird, ShieldCheck, ListChecks, Lock, HelpCircle,
+  CircleCheckBig, Flame, Sparkles, TrendingUp, Zap, Trophy, Bird, ShieldCheck, ListChecks, Apple, Salad, Lock, HelpCircle,
 } from "lucide-react";
 import { ACHIEVEMENTS, type AchievementDefEx } from "@/lib/game/achievements-def";
 import type { AchievementRarity } from "@/lib/types";
@@ -12,7 +12,7 @@ import { useT } from "@/hooks/use-t";
 import { cn } from "@/lib/utils";
 
 const ICONS: Record<string, LucideIcon> = {
-  CircleCheckBig, Flame, Sparkles, TrendingUp, Zap, Trophy, Bird, ShieldCheck, ListChecks,
+  CircleCheckBig, Flame, Sparkles, TrendingUp, Zap, Trophy, Bird, ShieldCheck, ListChecks, Apple, Salad,
 };
 
 const RARITY: Record<AchievementRarity, { ring: string; text: string; bg: string }> = {
