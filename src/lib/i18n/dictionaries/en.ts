@@ -102,7 +102,7 @@ export const en = {
   "habits.left": "{n} left",
   "habits.namePlaceholder": "e.g. Meditate 5 minutes",
   "habits.unitPlaceholder": "min, km…",
-  "habits.requiredHint": "Counts toward lives & perfect days",
+  "habits.requiredHint": "On: missing it can cost a life. Off: an extra habit — only earns XP when done, never costs a life.",
   "habits.cadence": "Cadence",
   "habits.cadence.daily": "Every day",
   "habits.cadence.weekdays": "Weekdays",

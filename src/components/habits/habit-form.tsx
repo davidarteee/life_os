@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Trash2 } from "lucide-react";
 import type { Habit, Domain } from "@/lib/types";
 import { useSession } from "@/components/providers/session-provider";
@@ -42,6 +42,22 @@ export function HabitForm({ open, onOpenChange, habit }: HabitFormProps) {
   const [unit, setUnit] = useState(habit?.unit ?? "");
   const [xpReward, setXpReward] = useState(habit?.xpReward ?? 10);
   const [required, setRequired] = useState(habit?.required ?? true);
+
+  // Re-sync the form to the habit being edited whenever the dialog opens. The
+  // dialog instance is reused, so useState initializers only run once on mount —
+  // without this, editing showed blank fields as if creating a new habit.
+  useEffect(() => {
+    if (!open) return;
+    setName(habit?.name ?? "");
+    setIcon(habit?.icon ?? "CircleCheck");
+    setColor((habit?.color as AccentKey) ?? "health");
+    setCadence(habit?.cadence ?? "daily");
+    setCustomDays(habit?.customDays ?? []);
+    setTarget(habit?.target ?? 1);
+    setUnit(habit?.unit ?? "");
+    setXpReward(habit?.xpReward ?? 10);
+    setRequired(habit?.required ?? true);
+  }, [open, habit]);
 
   if (!user) return null;
   const uid = user.id;

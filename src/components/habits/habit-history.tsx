@@ -5,11 +5,11 @@ import { useUserId } from "@/components/providers/session-provider";
 import { listHabits, allLogs, isScheduledOn } from "@/lib/data/habits";
 import { resolveIcon } from "@/lib/icons";
 import { accent } from "@/lib/domain-colors";
-import { startOfMonth, endOfMonth, dayKey, weekdayIndex, fromDayKey } from "@/lib/date";
+import { startOfMonth, endOfMonth, dayKey, weekdayIndex, fromDayKey, WEEKDAY_KEYS } from "@/lib/date";
 import { useT } from "@/hooks/use-t";
 import { cn } from "@/lib/utils";
 
-/** Current-month completion grid: one row per habit, one cell per day. */
+/** Current-month completion grid: one column per habit, one row per day. */
 export function HabitHistory() {
   const uid = useUserId();
   const { t } = useT();
@@ -38,45 +38,56 @@ export function HabitHistory() {
 
   if (!data || !logsData) return null;
   const today = dayKey();
+  const doneByHabit = logsData;
 
   return (
     <div className="overflow-x-auto">
-      <div className="min-w-[560px]">
-        <div className="mb-2 flex gap-1 pl-[168px]">
-          {data.days.map((d) => {
-            const n = fromDayKey(d).getDate();
+      <div className="w-fit">
+        {/* Header row: one column per habit */}
+        <div className="mb-1.5 flex gap-1">
+          <div className="w-12 shrink-0" />
+          {data.habits.map((habit) => {
+            const Icon = resolveIcon(habit.icon);
+            const a = accent(habit.color);
             return (
-              <div key={d} className={cn("w-5 text-center text-[9px]", d === today ? "font-bold text-primary" : "text-muted-foreground/60")}>
-                {n % 5 === 1 || n === 1 ? n : ""}
+              <div key={habit.id} className="flex w-6 shrink-0 justify-center" title={habit.name}>
+                <span className={cn("grid size-6 place-items-center rounded-md", a.bgSoft)}>
+                  <Icon className={cn("size-3.5", a.text)} />
+                </span>
               </div>
             );
           })}
         </div>
-        <div className="flex flex-col gap-1.5">
-          {data.habits.map((habit) => {
-            const Icon = resolveIcon(habit.icon);
-            const a = accent(habit.color);
-            const done = logsData.get(habit.id) ?? new Set<string>();
+
+        {/* One row per day of the month */}
+        <div className="flex flex-col gap-1">
+          {data.days.map((d) => {
+            const date = fromDayKey(d);
+            const n = date.getDate();
+            const wd = t(`weekday.${WEEKDAY_KEYS[weekdayIndex(date)]}` as const).charAt(0);
+            const isToday = d === today;
             return (
-              <div key={habit.id} className="flex items-center gap-1">
-                <div className="flex w-[160px] shrink-0 items-center gap-2 pr-2">
-                  <Icon className={cn("size-3.5", a.text)} />
-                  <span className="truncate text-xs">{habit.name}</span>
+              <div key={d} className="flex items-center gap-1">
+                <div className={cn("flex w-12 shrink-0 items-center justify-end gap-1 pr-1.5 text-[10px] tabular-nums", isToday ? "font-bold text-primary" : "text-muted-foreground/70")}>
+                  <span className="uppercase opacity-70">{wd}</span>
+                  <span>{n}</span>
                 </div>
-                {data.days.map((d) => {
-                  const isDone = done.has(d);
+                {data.habits.map((habit) => {
+                  const a = accent(habit.color);
+                  const isDone = (doneByHabit.get(habit.id) ?? new Set<string>()).has(d);
                   const past = d < today;
-                  const scheduled = isScheduledOn(habit, weekdayIndex(fromDayKey(d)));
+                  const scheduled = isScheduledOn(habit, weekdayIndex(date));
                   return (
-                    <div
-                      key={d}
-                      title={d}
-                      className={cn(
-                        "size-5 rounded-[4px] transition-colors",
-                        isDone ? a.bg : !scheduled ? "bg-transparent" : past && habit.required ? "bg-destructive/15" : "bg-muted",
-                        d === today && "ring-1 ring-primary",
-                      )}
-                    />
+                    <div key={habit.id} className="flex w-6 shrink-0 justify-center">
+                      <div
+                        title={`${habit.name} · ${d}`}
+                        className={cn(
+                          "size-5 rounded-[4px] transition-colors",
+                          isDone ? a.bg : !scheduled ? "bg-transparent" : past && habit.required ? "bg-destructive/15" : "bg-muted",
+                          isToday && "ring-1 ring-primary",
+                        )}
+                      />
+                    </div>
                   );
                 })}
               </div>

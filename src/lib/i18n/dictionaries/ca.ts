@@ -99,7 +99,7 @@ export const ca: Partial<Record<DictKey, string>> = {
   "habits.left": "En queden {n}",
   "habits.namePlaceholder": "p. ex. Meditar 5 minuts",
   "habits.unitPlaceholder": "min, km…",
-  "habits.requiredHint": "Compta per a les vides i els dies perfectes",
+  "habits.requiredHint": "Activat: no fer-lo pot restar una vida. Desactivat: hàbit extra — només suma XP en fer-lo, mai resta vida.",
   "habits.cadence": "Freqüència",
   "habits.cadence.daily": "Cada dia",
   "habits.cadence.weekdays": "Dies laborables",
