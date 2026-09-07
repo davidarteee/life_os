@@ -26,7 +26,7 @@ export function WidgetContent({ id }: { id: WidgetId }) {
   const { t } = useT();
   switch (id) {
     case "today-habits":
-      return <TodayHabits limit={6} />;
+      return <TodayHabits />;
     case "today-tasks":
       return <TodayTasksWidget />;
     case "task-inbox":

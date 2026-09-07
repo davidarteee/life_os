@@ -238,3 +238,20 @@ export async function runSync(userId: string): Promise<SyncReport> {
 export async function pendingMutationCount(userId: string): Promise<number> {
   return db().mutations.where("user_id").equals(userId).count();
 }
+
+/**
+ * Permanently delete ALL of a user's cloud rows across every synced table
+ * (scoped to their own user_id — RLS allows deleting only their rows). Used by
+ * the "reset everything" action so a fresh start isn't immediately re-pulled
+ * from the cloud. No-op when Supabase isn't configured. Destructive.
+ */
+export async function wipeCloudData(userId: string): Promise<{ errors: number }> {
+  const supabase = getSupabaseBrowser();
+  if (!supabase) return { errors: 0 };
+  let errors = 0;
+  for (const table of Object.keys(REGISTRY) as SyncTable[]) {
+    const { error } = await supabase.from(REGISTRY[table].remote).delete().eq("user_id", userId);
+    if (error) errors += 1;
+  }
+  return { errors };
+}

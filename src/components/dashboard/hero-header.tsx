@@ -37,7 +37,8 @@ export function HeroHeader() {
   const { t } = useT();
   const locale = useLocaleStore((s) => s.locale);
   const [now, setNow] = useState<Date | null>(null);
-  const [autoImage, setAutoImage] = useState<string | null>(null);
+  const [pair, setPair] = useState<[string, string] | null>(null);
+  const [front, setFront] = useState(0); // which of the two layers is visible
 
   useEffect(() => {
     setNow(new Date());
@@ -45,14 +46,18 @@ export function HeroHeader() {
     return () => clearInterval(id);
   }, []);
 
-  // Pick a fresh landscape once per mount (kept out of render for purity).
+  // Pick two distinct landscapes once per mount and slowly crossfade between
+  // them, so the backdrop reads as ambient video (kept out of render for purity).
   useEffect(() => {
-    const base = LANDSCAPES[Math.floor(Math.random() * LANDSCAPES.length)];
-    setAutoImage(`${base}?auto=format&fit=crop&w=1800&q=80`);
+    const shuffled = [...LANDSCAPES].sort(() => Math.random() - 0.5);
+    const opt = "?auto=format&fit=crop&w=1920&q=80";
+    setPair([`${shuffled[0]}${opt}`, `${shuffled[1]}${opt}`]);
+    const id = setInterval(() => setFront((f) => (f === 0 ? 1 : 0)), 12_000);
+    return () => clearInterval(id);
   }, []);
 
-  const bg =
-    settings?.heroMode === "custom" && settings.heroImageUrl ? settings.heroImageUrl : autoImage;
+  const custom = settings?.heroMode === "custom" && settings.heroImageUrl ? settings.heroImageUrl : null;
+  const customIsVideo = !!custom && /\.(mp4|webm|ogg|mov)(\?|$)/i.test(custom);
 
   const greet = t(`greeting.${greetingKey(now ?? new Date())}` as const);
   const dateStr = capitalizeFirst(now?.toLocaleDateString(locale, { weekday: "long", day: "numeric", month: "long" }) ?? "");
@@ -61,15 +66,44 @@ export function HeroHeader() {
   return (
     <section className="relative overflow-hidden rounded-2xl border border-border/60">
       <div className="aurora absolute inset-0" />
-      <div
-        className="absolute inset-0 bg-cover bg-center transition-opacity duration-700"
-        style={{ backgroundImage: bg ? `url("${bg}")` : undefined, opacity: bg ? 1 : 0 }}
-        aria-hidden
-      />
+
+      {customIsVideo ? (
+        <video
+          className="absolute inset-0 size-full object-cover"
+          src={custom}
+          autoPlay
+          loop
+          muted
+          playsInline
+          aria-hidden
+        />
+      ) : custom ? (
+        <div
+          className="hero-kb-a absolute inset-0 bg-cover bg-center"
+          style={{ backgroundImage: `url("${custom}")` }}
+          aria-hidden
+        />
+      ) : (
+        pair && (
+          <>
+            <div
+              className="hero-kb-a absolute inset-0 bg-cover bg-center transition-opacity duration-[2000ms]"
+              style={{ backgroundImage: `url("${pair[0]}")`, opacity: front === 0 ? 1 : 0 }}
+              aria-hidden
+            />
+            <div
+              className="hero-kb-b absolute inset-0 bg-cover bg-center transition-opacity duration-[2000ms]"
+              style={{ backgroundImage: `url("${pair[1]}")`, opacity: front === 1 ? 1 : 0 }}
+              aria-hidden
+            />
+          </>
+        )
+      )}
+
       <div className="absolute inset-0 bg-gradient-to-t from-background via-background/70 to-background/20" />
       <div className="absolute inset-0 bg-gradient-to-r from-background/80 to-transparent" />
 
-      <div className="relative z-10 flex min-h-[200px] flex-col justify-between gap-6 p-5 md:min-h-[240px] md:flex-row md:items-end md:p-7">
+      <div className="relative z-10 flex min-h-[280px] flex-col justify-between gap-6 p-5 md:min-h-[380px] md:flex-row md:items-end md:p-7">
         <div className="max-w-lg">
           <p className="text-xs font-medium uppercase tracking-wider text-primary">{t("app.tagline")}</p>
           <h1 className="mt-2 font-heading text-2xl font-bold tracking-tight text-balance md:text-4xl">

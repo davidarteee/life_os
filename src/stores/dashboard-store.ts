@@ -7,10 +7,17 @@ import { DEFAULT_WIDGET_ORDER, WIDGET_META, type WidgetId } from "@/lib/dashboar
  * overrides. Persisted locally (and portable — a future migration can sync this
  * to user_settings). The store is the single source of truth the grid renders.
  */
+/** Vertical sizing bounds (px). `undefined` height means auto (fit content). */
+export const HEIGHT_MIN = 160;
+export const HEIGHT_MAX = 900;
+export const HEIGHT_STEP = 80;
+export const HEIGHT_BASE = 280;
+
 interface DashboardState {
   order: WidgetId[];
   hidden: WidgetId[];
   spans: Partial<Record<WidgetId, number>>;
+  heights: Partial<Record<WidgetId, number>>;
   editing: boolean;
 
   setEditing: (v: boolean) => void;
@@ -18,6 +25,9 @@ interface DashboardState {
   hide: (id: WidgetId) => void;
   show: (id: WidgetId) => void;
   setSpan: (id: WidgetId, span: number) => void;
+  /** Nudge a widget's min-height by `delta` px (from its current or the base). */
+  bumpHeight: (id: WidgetId, delta: number) => void;
+  resetHeight: (id: WidgetId) => void;
   reset: () => void;
 }
 
@@ -27,6 +37,7 @@ export const useDashboardStore = create<DashboardState>()(
       order: [...DEFAULT_WIDGET_ORDER],
       hidden: [],
       spans: {},
+      heights: {},
       editing: false,
 
       setEditing: (v) => set({ editing: v }),
@@ -40,11 +51,23 @@ export const useDashboardStore = create<DashboardState>()(
           const clamped = Math.max(meta.minSpan, Math.min(meta.maxSpan, span));
           return { spans: { ...s.spans, [id]: clamped } };
         }),
-      reset: () => set({ order: [...DEFAULT_WIDGET_ORDER], hidden: [], spans: {} }),
+      bumpHeight: (id, delta) =>
+        set((s) => {
+          const current = s.heights[id] ?? HEIGHT_BASE;
+          const clamped = Math.max(HEIGHT_MIN, Math.min(HEIGHT_MAX, current + delta));
+          return { heights: { ...s.heights, [id]: clamped } };
+        }),
+      resetHeight: (id) =>
+        set((s) => {
+          const next = { ...s.heights };
+          delete next[id];
+          return { heights: next };
+        }),
+      reset: () => set({ order: [...DEFAULT_WIDGET_ORDER], hidden: [], spans: {}, heights: {} }),
     }),
     {
       name: "lifeos:dashboard",
-      partialize: (s) => ({ order: s.order, hidden: s.hidden, spans: s.spans }),
+      partialize: (s) => ({ order: s.order, hidden: s.hidden, spans: s.spans, heights: s.heights }),
     },
   ),
 );

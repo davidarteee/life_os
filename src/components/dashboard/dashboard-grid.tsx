@@ -7,8 +7,8 @@ import {
   SortableContext, sortableKeyboardCoordinates, rectSortingStrategy, useSortable, arrayMove,
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import { GripVertical, EyeOff, Minus, Plus } from "lucide-react";
-import { useDashboardStore } from "@/stores/dashboard-store";
+import { GripVertical, EyeOff, Minus, Plus, ChevronUp, ChevronDown } from "lucide-react";
+import { useDashboardStore, HEIGHT_STEP } from "@/stores/dashboard-store";
 import { WIDGET_META, DEFAULT_WIDGET_ORDER, type WidgetId } from "@/lib/dashboard/widgets";
 import { WidgetContent } from "@/components/dashboard/widget-registry";
 import { Button } from "@/components/ui/button";
@@ -18,7 +18,9 @@ import { cn } from "@/lib/utils";
 function SortableWidget({ id }: { id: WidgetId }) {
   const editing = useDashboardStore((s) => s.editing);
   const spans = useDashboardStore((s) => s.spans);
+  const heights = useDashboardStore((s) => s.heights);
   const setSpan = useDashboardStore((s) => s.setSpan);
+  const bumpHeight = useDashboardStore((s) => s.bumpHeight);
   const hide = useDashboardStore((s) => s.hide);
   const { t } = useT();
   const meta = WIDGET_META.get(id);
@@ -26,13 +28,19 @@ function SortableWidget({ id }: { id: WidgetId }) {
 
   if (!meta) return null;
   const span = spans[id] ?? meta.span;
+  const height = heights[id];
 
   return (
     <div
       ref={setNodeRef}
-      style={{ transform: CSS.Transform.toString(transform), transition, gridColumn: `span ${span}` }}
+      style={{
+        transform: CSS.Transform.toString(transform),
+        transition,
+        gridColumn: `span ${span}`,
+        minHeight: height ? `${height}px` : undefined,
+      }}
       className={cn(
-        "rounded-2xl border border-border/60 bg-card p-4 transition-shadow",
+        "flex flex-col rounded-2xl border border-border/60 bg-card p-4 transition-shadow",
         isDragging && "z-20 opacity-80 shadow-xl",
         editing && "ring-1 ring-primary/30",
       )}
@@ -50,6 +58,13 @@ function SortableWidget({ id }: { id: WidgetId }) {
                 <Button size="icon" variant="ghost" className="size-6" onClick={() => setSpan(id, span + 1)} aria-label={t("widgets.widen")}>
                   <Plus className="size-3" />
                 </Button>
+                <span className="mx-0.5 h-4 w-px bg-border/60" />
+                <Button size="icon" variant="ghost" className="size-6" onClick={() => bumpHeight(id, -HEIGHT_STEP)} aria-label={t("widgets.shorten")}>
+                  <ChevronUp className="size-3.5" />
+                </Button>
+                <Button size="icon" variant="ghost" className="size-6" onClick={() => bumpHeight(id, HEIGHT_STEP)} aria-label={t("widgets.taller")}>
+                  <ChevronDown className="size-3.5" />
+                </Button>
               </>
             )}
             <Button size="icon" variant="ghost" className="size-6 text-muted-foreground" onClick={() => hide(id)} aria-label={t("widgets.hide")}>
@@ -61,7 +76,7 @@ function SortableWidget({ id }: { id: WidgetId }) {
           </div>
         )}
       </div>
-      <div className={cn(editing && "pointer-events-none select-none")}>
+      <div className={cn("min-h-0 flex-1", editing && "pointer-events-none select-none")}>
         <WidgetContent id={id} />
       </div>
     </div>

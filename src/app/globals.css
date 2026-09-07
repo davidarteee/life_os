@@ -249,6 +249,30 @@
   }
 }
 
+/* Cinematic hero: slow Ken Burns drift on the landscape layers, so a still
+   mountain photo reads as ambient video. Two layers use different timings and
+   crossfade for continuous motion. Disabled under reduced-motion. */
+@keyframes kenburns-a {
+  0% { transform: scale(1.05) translate3d(0, 0, 0); }
+  100% { transform: scale(1.2) translate3d(-2.5%, -2%, 0); }
+}
+@keyframes kenburns-b {
+  0% { transform: scale(1.2) translate3d(-2%, -1%, 0); }
+  100% { transform: scale(1.05) translate3d(2%, 2.5%, 0); }
+}
+.hero-kb-a {
+  animation: kenburns-a 28s ease-in-out infinite alternate;
+}
+.hero-kb-b {
+  animation: kenburns-b 32s ease-in-out infinite alternate;
+}
+@media (prefers-reduced-motion: reduce) {
+  .hero-kb-a,
+  .hero-kb-b {
+    animation: none;
+  }
+}
+
 /* Slot-machine reel animation for the challenge roulette */
 @keyframes reel-spin {
   from {

@@ -16,6 +16,7 @@ import { useLocaleStore } from "@/stores/locale-store";
 import { updateSettings } from "@/lib/data/settings";
 import { exportUserJSON, exportHabitsCSV, downloadFile } from "@/lib/data/export";
 import { resetLocalDatabase } from "@/lib/db/dexie";
+import { wipeCloudData } from "@/lib/sync/sync-engine";
 import { LOCALES } from "@/lib/i18n";
 import { isSupabaseConfigured } from "@/config/env";
 import { DEFAULT_NUTRITION_CONFIG } from "@/lib/nutrition/config";
@@ -289,6 +290,29 @@ export default function SettingsPage() {
                 {t("settings.resetLocal")}
               </Button>
             </div>
+
+            {!isLocalMode && (
+              <div className="rounded-lg border border-destructive/50 bg-destructive/10 p-3">
+                <p className="text-sm font-medium text-destructive">{t("settings.resetAll")}</p>
+                <p className="mt-0.5 text-xs text-muted-foreground">{t("settings.resetAllDesc")}</p>
+                <Button
+                  variant="destructive"
+                  size="sm"
+                  className="mt-2"
+                  onClick={async () => {
+                    if (!user) return;
+                    if (!window.confirm(t("settings.resetAllConfirm"))) return;
+                    if (!window.confirm(t("settings.resetAllConfirm2"))) return;
+                    toast.loading(t("settings.resetAllRunning"));
+                    await wipeCloudData(user.id).catch(() => {});
+                    await resetLocalDatabase();
+                    window.location.href = "/dashboard";
+                  }}
+                >
+                  {t("settings.resetAll")}
+                </Button>
+              </div>
+            )}
           </CardContent>
         </Card>
 
