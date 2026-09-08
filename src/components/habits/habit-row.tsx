@@ -61,7 +61,7 @@ export function HabitRow({ item, day, onEdit }: HabitRowProps) {
         <Button
           variant="ghost"
           size="icon"
-          className="size-8 opacity-0 transition-opacity group-hover:opacity-100"
+          className="size-8 opacity-100 transition-opacity md:opacity-0 md:group-hover:opacity-100"
           onClick={onEdit}
           aria-label={t("habits.edit")}
         >

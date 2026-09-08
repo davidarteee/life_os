@@ -49,7 +49,7 @@ export function MealBlock({ meal, day, entries }: { meal: MealSlot; day: string;
               <button
                 onClick={() => remove(e)}
                 aria-label={t("common.remove")}
-                className="rounded p-1 text-muted-foreground opacity-0 transition-opacity hover:bg-muted hover:text-destructive group-hover:opacity-100"
+                className="rounded p-1 text-muted-foreground opacity-100 transition-opacity hover:bg-muted hover:text-destructive md:opacity-0 md:group-hover:opacity-100"
               >
                 <X className="size-3.5" />
               </button>

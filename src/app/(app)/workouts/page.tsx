@@ -79,7 +79,7 @@ export default function WorkoutsPage() {
                         </p>
                         {w.notes && <p className="mt-0.5 truncate text-[11px] text-muted-foreground/80">{w.notes}</p>}
                       </div>
-                      <button onClick={() => openEdit(w)} aria-label={t("common.edit")} className="rounded p-1.5 text-muted-foreground opacity-0 transition-opacity hover:bg-muted hover:text-foreground group-hover:opacity-100">
+                      <button onClick={() => openEdit(w)} aria-label={t("common.edit")} className="rounded p-1.5 text-muted-foreground opacity-100 transition-opacity hover:bg-muted hover:text-foreground md:opacity-0 md:group-hover:opacity-100">
                         <Pencil className="size-3.5" />
                       </button>
                     </li>

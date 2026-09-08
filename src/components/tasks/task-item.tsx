@@ -88,7 +88,7 @@ export function TaskItem({ task, onEdit, dragHandle, showDate = true }: TaskItem
       {/* Schedule popover */}
       <Popover open={dateOpen} onOpenChange={setDateOpen}>
         <PopoverTrigger asChild>
-          <Button variant="ghost" size="icon" className="size-7 text-muted-foreground opacity-0 transition-opacity group-hover:opacity-100 data-[state=open]:opacity-100" aria-label={t("tasks.scheduleFor")}>
+          <Button variant="ghost" size="icon" className="size-7 text-muted-foreground opacity-100 transition-opacity md:opacity-0 md:group-hover:opacity-100 data-[state=open]:opacity-100" aria-label={t("tasks.scheduleFor")}>
             <CalendarDays className="size-3.5" />
           </Button>
         </PopoverTrigger>
@@ -108,7 +108,7 @@ export function TaskItem({ task, onEdit, dragHandle, showDate = true }: TaskItem
 
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Button variant="ghost" size="icon" className="size-7 text-muted-foreground opacity-0 transition-opacity group-hover:opacity-100">
+          <Button variant="ghost" size="icon" className="size-7 text-muted-foreground opacity-100 transition-opacity md:opacity-0 md:group-hover:opacity-100">
             <MoreVertical className="size-3.5" />
           </Button>
         </DropdownMenuTrigger>
