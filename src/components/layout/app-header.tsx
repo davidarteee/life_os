@@ -19,38 +19,42 @@ export function AppHeader() {
   const { t } = useT();
 
   return (
-    <header className="sticky top-0 z-30 flex h-16 items-center gap-2 border-b border-border/70 bg-background/80 px-3 backdrop-blur-md md:px-5">
-      {/* Mobile menu */}
-      <Button
-        variant="ghost"
-        size="icon"
-        className="size-9 md:hidden"
-        onClick={() => setMobileNav(true)}
-        aria-label={t("nav.openNav")}
-      >
-        <Menu className="size-5" />
-      </Button>
+    // pt-[safe-area] pushes the bar below the iOS status bar in the installed
+    // PWA (black-translucent + viewport-fit=cover render content under it).
+    <header className="sticky top-0 z-30 border-b border-border/70 bg-background/80 backdrop-blur-md [padding-top:env(safe-area-inset-top)]">
+      <div className="flex h-16 items-center gap-2 px-3 md:px-5">
+        {/* Mobile menu */}
+        <Button
+          variant="ghost"
+          size="icon"
+          className="size-9 md:hidden"
+          onClick={() => setMobileNav(true)}
+          aria-label={t("nav.openNav")}
+        >
+          <Menu className="size-5" />
+        </Button>
 
-      {/* Desktop: reopen collapsed sidebar */}
-      <Button
-        variant="ghost"
-        size="icon"
-        className={cn("hidden size-9", collapsed ? "md:inline-flex" : "md:hidden")}
-        onClick={toggleSidebar}
-        aria-label={t("nav.openSidebar")}
-      >
-        <PanelLeftOpen className="size-4" />
-      </Button>
+        {/* Desktop: reopen collapsed sidebar */}
+        <Button
+          variant="ghost"
+          size="icon"
+          className={cn("hidden size-9", collapsed ? "md:inline-flex" : "md:hidden")}
+          onClick={toggleSidebar}
+          aria-label={t("nav.openSidebar")}
+        >
+          <PanelLeftOpen className="size-4" />
+        </Button>
 
-      <div className="md:hidden">
-        <Brand />
-      </div>
+        <div className="md:hidden">
+          <Brand />
+        </div>
 
-      <div className="ml-auto flex items-center gap-1.5">
-        <GmailQuickAccess />
-        <SyncStatus />
-        <ThemeToggle />
-        <UserMenu />
+        <div className="ml-auto flex items-center gap-1.5">
+          <GmailQuickAccess />
+          <SyncStatus />
+          <ThemeToggle />
+          <UserMenu />
+        </div>
       </div>
     </header>
   );

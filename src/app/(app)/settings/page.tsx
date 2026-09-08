@@ -17,6 +17,7 @@ import { updateSettings } from "@/lib/data/settings";
 import { exportUserJSON, exportHabitsCSV, downloadFile } from "@/lib/data/export";
 import { resetLocalDatabase } from "@/lib/db/dexie";
 import { wipeCloudData } from "@/lib/sync/sync-engine";
+import { dedupeUserData } from "@/lib/data/maintenance";
 import { LOCALES } from "@/lib/i18n";
 import { isSupabaseConfigured } from "@/config/env";
 import { DEFAULT_NUTRITION_CONFIG } from "@/lib/nutrition/config";
@@ -273,6 +274,24 @@ export default function SettingsPage() {
                 {t("settings.exportCsv")}
               </Button>
             </div>
+            <div className="rounded-lg border border-border/60 p-3">
+              <p className="text-sm font-medium">{t("settings.dedupe")}</p>
+              <p className="mt-0.5 text-xs text-muted-foreground">{t("settings.dedupeDesc")}</p>
+              <Button
+                variant="outline"
+                size="sm"
+                className="mt-2"
+                onClick={async () => {
+                  if (!user) return;
+                  const { tasks, events } = await dedupeUserData(user.id);
+                  const total = tasks + events;
+                  toast.success(total === 0 ? t("settings.dedupeNone") : t("settings.dedupeDone", { n: total }));
+                }}
+              >
+                {t("settings.dedupe")}
+              </Button>
+            </div>
+
             <div className="rounded-lg border border-destructive/30 bg-destructive/5 p-3">
               <p className="text-sm font-medium">{t("settings.resetLocal")}</p>
               <p className="mt-0.5 text-xs text-muted-foreground">{t("settings.resetLocalDesc")}</p>

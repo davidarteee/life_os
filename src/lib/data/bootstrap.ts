@@ -62,6 +62,9 @@ async function adoptLocalData(toUserId: string): Promise<boolean> {
     database.habits, database.habitLogs, database.gameState, database.xpEvents,
     database.freeDays, database.shopPurchases, database.userAchievements,
     database.challenges, database.settings,
+    // Module tables must be adopted too, or local-mode tasks/events/nutrition
+    // are orphaned under LOCAL_USER_ID when the user first signs in.
+    database.tasks, database.foods, database.foodEntries, database.workouts, database.events,
   ] as unknown as Table<OwnedRecord, string>[];
 
   let moved = 0;
