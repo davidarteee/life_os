@@ -82,6 +82,8 @@ export const es: Partial<Record<DictKey, string>> = {
   "habits.title": "Hábitos",
   "habits.subtitle": "Tus rituales diarios y tus rachas.",
   "habits.today": "Hábitos de hoy",
+  "habits.prevDay": "Día anterior",
+  "habits.nextDay": "Día siguiente",
   "habits.new": "Nuevo hábito",
   "habits.edit": "Editar hábito",
   "habits.name": "Nombre",

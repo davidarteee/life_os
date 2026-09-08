@@ -4,7 +4,7 @@ import { useLiveQuery } from "dexie-react-hooks";
 import { useUserId } from "@/components/providers/session-provider";
 import { listHabits, logsForDay, allLogs, isScheduledOn } from "@/lib/data/habits";
 import { currentStreak, longestStreak } from "@/lib/game/engine";
-import { dayKey, weekdayIndex } from "@/lib/date";
+import { dayKey, weekdayIndex, fromDayKey } from "@/lib/date";
 import type { Habit, HabitLog } from "@/lib/types";
 
 export interface HabitToday {
@@ -25,7 +25,7 @@ export function useTodayHabits(day: string = dayKey()) {
       logsForDay(uid, day),
       allLogs(uid),
     ]);
-    const weekday = weekdayIndex(new Date());
+    const weekday = weekdayIndex(fromDayKey(day)); // schedule for the SELECTED day, not today
     const logByHabit = new Map(todays.map((l) => [l.habitId, l]));
 
     const completedDaysByHabit = new Map<string, Set<string>>();

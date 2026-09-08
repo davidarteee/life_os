@@ -85,6 +85,8 @@ export const en = {
   "habits.title": "Habits",
   "habits.subtitle": "Your daily rituals and streaks.",
   "habits.today": "Today's habits",
+  "habits.prevDay": "Previous day",
+  "habits.nextDay": "Next day",
   "habits.new": "New habit",
   "habits.edit": "Edit habit",
   "habits.name": "Name",

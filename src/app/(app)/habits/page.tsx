@@ -48,7 +48,7 @@ export default function HabitsPage() {
             <CardTitle className="text-base">{t("habits.today")}</CardTitle>
           </CardHeader>
           <CardContent>
-            <TodayHabits manage addButton={false} />
+            <TodayHabits manage navigable addButton={false} />
           </CardContent>
         </Card>
 
