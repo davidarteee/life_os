@@ -102,7 +102,10 @@ export function MiniCalendarWidget() {
             <div key={cell.key} className={cn("relative grid aspect-square place-items-center rounded text-[9px] tabular-nums", cell.inMonth ? "text-foreground" : "text-muted-foreground/40", cell.isToday && "bg-primary font-bold text-primary-foreground")}>
               {cell.date.getDate()}
               {dayItems.length > 0 && !cell.isToday && (
-                <span className={cn("absolute bottom-0.5 size-1 rounded-full", dayItems[0].priority ? PRIORITY[dayItems[0].priority].dot : ACCENT[dayItems[0].accent].dot)} />
+                <span
+                  className={cn("absolute bottom-0.5 size-1 rounded-full", !dayItems[0].color && (dayItems[0].priority ? PRIORITY[dayItems[0].priority].dot : ACCENT[dayItems[0].accent].dot))}
+                  style={dayItems[0].color ? { background: dayItems[0].color } : undefined}
+                />
               )}
             </div>
           );

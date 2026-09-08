@@ -84,20 +84,35 @@ export interface Task extends OwnedRecord {
 /* ---------------------------------------------------------------- Events -- */
 
 /** Event categories double as the color-coded "sections" in the UI. */
-export type EventCategory = "exam" | "medical" | "important" | "personal" | "social" | "other";
-export const EVENT_CATEGORIES: EventCategory[] = ["exam", "medical", "important", "personal", "social", "other"];
+export type EventCategory =
+  | "amigos" | "familia" | "deporte" | "uni" | "cumples" | "cortesito"
+  | "clases" | "pagos" | "medico" | "personal" | "otros";
+export const EVENT_CATEGORIES: EventCategory[] = [
+  "amigos", "familia", "deporte", "uni", "cumples", "cortesito",
+  "clases", "pagos", "medico", "personal", "otros",
+];
+
+/** How often an event repeats. `interval` is the "every N" step (≥ 1). */
+export type RepeatFreq = "daily" | "weekly" | "monthly" | "yearly";
+export const REPEAT_FREQS: RepeatFreq[] = ["daily", "weekly", "monthly", "yearly"];
+export interface EventRepeat {
+  freq: RepeatFreq;
+  interval: number; // every `interval` units (1 = every day/week/month/year)
+}
 
 /**
- * A dated thing to remember — an exam, a doctor's appointment, an important
- * date. Unlike a Task it has no priority and isn't "completed"; it just happens
- * on its day. It surfaces on the unified Calendar, colored by its category.
+ * A dated thing to remember — an exam, a doctor's appointment, a birthday. It
+ * has no priority and isn't "completed"; it just happens on its day (and can
+ * repeat). It surfaces on the unified Calendar, colored by its category.
  */
 export interface Event extends OwnedRecord {
   title: string;
-  date: DayKey; // the day it happens (YYYY-MM-DD)
+  date: DayKey; // the (first) day it happens (YYYY-MM-DD)
   time?: string; // optional HH:MM
   category: EventCategory;
   notes?: string;
+  /** Optional recurrence; undefined = one-off. */
+  repeat?: EventRepeat;
 }
 
 /* ------------------------------------------------------------ Nutrition -- */

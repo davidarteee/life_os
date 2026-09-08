@@ -10,12 +10,10 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { EventList, EventItem } from "@/components/events/event-list";
 import { EventForm } from "@/components/events/event-form";
 import { EVENT_CATEGORY } from "@/components/events/category";
-import { ACCENT } from "@/lib/domain-colors";
 import { EVENT_CATEGORIES } from "@/lib/types";
 import { useAllEvents, useEventsForDay, useUpcomingEvents, useEventStats } from "@/hooks/use-events";
 import type { Event } from "@/lib/types";
 import { useT } from "@/hooks/use-t";
-import { cn } from "@/lib/utils";
 
 export default function EventsPage() {
   const { t } = useT();
@@ -66,7 +64,15 @@ export default function EventsPage() {
 
         <TabsContent value="upcoming" className="mt-4">
           <Card><CardContent className="pt-6">
-            <EventList events={upcoming} onEdit={openEdit} emptyText={t("events.emptyUpcoming")} />
+            {upcoming.length === 0 ? (
+              <p className="py-6 text-center text-sm text-muted-foreground">{t("events.emptyUpcoming")}</p>
+            ) : (
+              <div className="flex flex-col gap-1.5">
+                {upcoming.map(({ event, day }) => (
+                  <EventItem key={`${event.id}:${day}`} event={event} displayDate={day} onEdit={openEdit} />
+                ))}
+              </div>
+            )}
           </CardContent></Card>
         </TabsContent>
 
@@ -82,7 +88,7 @@ export default function EventsPage() {
                 const Icon = meta.icon;
                 return (
                   <Card key={category}><CardContent className="pt-5">
-                    <p className={cn("mb-3 flex items-center gap-2 text-xs font-semibold uppercase tracking-wide", ACCENT[meta.accent].text)}>
+                    <p className="mb-3 flex items-center gap-2 text-xs font-semibold uppercase tracking-wide" style={{ color: meta.color }}>
                       <Icon className="size-4" /> {t(meta.labelKey)} <span className="text-muted-foreground/60">· {events.length}</span>
                     </p>
                     <div className="flex flex-col gap-1.5">

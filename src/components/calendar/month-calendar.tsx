@@ -84,7 +84,7 @@ export function MonthCalendar() {
                 <div className="hidden flex-col gap-0.5 md:flex">
                   {dayItems.slice(0, 3).map((it) => (
                     <div key={it.id} className="flex items-center gap-1 truncate rounded bg-muted/60 px-1 py-0.5 text-[10px]">
-                      <span className={cn("size-1.5 shrink-0 rounded-full", itemDot(it))} />
+                      <span className={cn("size-1.5 shrink-0 rounded-full", !it.color && itemDot(it))} style={it.color ? { background: it.color } : undefined} />
                       <span className={cn("truncate", it.done && "text-muted-foreground line-through")}>{it.title}</span>
                     </div>
                   ))}
@@ -93,7 +93,7 @@ export function MonthCalendar() {
                 {/* Mobile dots */}
                 {dayItems.length > 0 && (
                   <div className="mt-auto flex flex-wrap gap-0.5 md:hidden">
-                    {dayItems.slice(0, 4).map((it) => <span key={it.id} className={cn("size-1.5 rounded-full", itemDot(it))} />)}
+                    {dayItems.slice(0, 4).map((it) => <span key={it.id} className={cn("size-1.5 rounded-full", !it.color && itemDot(it))} style={it.color ? { background: it.color } : undefined} />)}
                   </div>
                 )}
               </button>

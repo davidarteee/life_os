@@ -1,19 +1,20 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Trash2 } from "lucide-react";
+import { Trash2, Repeat } from "lucide-react";
 import { toast } from "sonner";
-import type { Event, EventCategory } from "@/lib/types";
-import { EVENT_CATEGORIES } from "@/lib/types";
+import type { Event, EventCategory, RepeatFreq } from "@/lib/types";
+import { EVENT_CATEGORIES, REPEAT_FREQS } from "@/lib/types";
 import { useSession } from "@/components/providers/session-provider";
 import { createEvent, updateEvent, deleteEvent } from "@/lib/data/events";
 import { EVENT_CATEGORY } from "@/components/events/category";
-import { ACCENT } from "@/lib/domain-colors";
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { Switch } from "@/components/ui/switch";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { dayKey } from "@/lib/date";
 import { useT } from "@/hooks/use-t";
 import { cn } from "@/lib/utils";
@@ -30,11 +31,14 @@ export function EventForm({ open, onOpenChange, event, defaultDate }: EventFormP
   const { t } = useT();
   const editing = !!event;
 
-  const [title, setTitle] = useState(event?.title ?? "");
-  const [date, setDate] = useState(event?.date ?? defaultDate ?? dayKey());
-  const [time, setTime] = useState(event?.time ?? "");
-  const [category, setCategory] = useState<EventCategory>(event?.category ?? "important");
-  const [notes, setNotes] = useState(event?.notes ?? "");
+  const [title, setTitle] = useState("");
+  const [date, setDate] = useState("");
+  const [time, setTime] = useState("");
+  const [category, setCategory] = useState<EventCategory>("personal");
+  const [notes, setNotes] = useState("");
+  const [repeatOn, setRepeatOn] = useState(false);
+  const [freq, setFreq] = useState<RepeatFreq>("weekly");
+  const [interval, setIntervalN] = useState(1);
 
   // Re-sync to the event being edited whenever the dialog opens (the dialog
   // instance is reused, so useState initializers only run once on mount).
@@ -43,8 +47,11 @@ export function EventForm({ open, onOpenChange, event, defaultDate }: EventFormP
     setTitle(event?.title ?? "");
     setDate(event?.date ?? defaultDate ?? dayKey());
     setTime(event?.time ?? "");
-    setCategory(event?.category ?? "important");
+    setCategory((event?.category as EventCategory) ?? "personal");
     setNotes(event?.notes ?? "");
+    setRepeatOn(!!event?.repeat);
+    setFreq(event?.repeat?.freq ?? "weekly");
+    setIntervalN(event?.repeat?.interval ?? 1);
   }, [open, event, defaultDate]);
 
   if (!user) return null;
@@ -52,9 +59,10 @@ export function EventForm({ open, onOpenChange, event, defaultDate }: EventFormP
 
   async function onSave() {
     if (!title.trim() || !date) return;
-    const payload = { title, date, time: time || undefined, category, notes: notes || undefined };
+    const repeat = repeatOn ? { freq, interval: Math.max(1, Math.floor(interval)) } : undefined;
+    const payload = { title: title.trim(), date, time: time || undefined, category, notes: notes.trim() || undefined, repeat };
     if (editing && event) {
-      await updateEvent(uid, { ...event, ...payload, title: title.trim(), notes: notes.trim() || undefined });
+      await updateEvent(uid, { ...event, ...payload });
     } else {
       await createEvent(uid, payload);
     }
@@ -95,8 +103,9 @@ export function EventForm({ open, onOpenChange, event, defaultDate }: EventFormP
                     onClick={() => setCategory(c)}
                     className={cn(
                       "flex items-center gap-1.5 rounded-lg border px-2 py-2 text-xs transition-colors",
-                      active ? cn(ACCENT[meta.accent].border, ACCENT[meta.accent].bgSoft, ACCENT[meta.accent].text) : "border-border/60 text-muted-foreground hover:bg-muted",
+                      active ? "font-medium" : "border-border/60 text-muted-foreground hover:bg-muted",
                     )}
+                    style={active ? { borderColor: meta.color, background: `color-mix(in oklch, ${meta.color} 14%, transparent)`, color: meta.color } : undefined}
                   >
                     <Icon className="size-3.5 shrink-0" /> <span className="truncate">{t(meta.labelKey)}</span>
                   </button>
@@ -114,6 +123,37 @@ export function EventForm({ open, onOpenChange, event, defaultDate }: EventFormP
               <Label htmlFor="event-time">{t("events.time")}</Label>
               <Input id="event-time" type="time" value={time} onChange={(e) => setTime(e.target.value)} />
             </div>
+          </div>
+
+          {/* Recurrence */}
+          <div className="rounded-lg border border-border/60 px-3 py-2.5">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Repeat className="size-4 text-muted-foreground" />
+                <p className="text-sm font-medium">{t("events.repeat")}</p>
+              </div>
+              <Switch checked={repeatOn} onCheckedChange={setRepeatOn} />
+            </div>
+            {repeatOn && (
+              <div className="mt-3 flex items-center gap-2">
+                <span className="text-sm text-muted-foreground">{t("events.every")}</span>
+                <Input
+                  type="number"
+                  min={1}
+                  value={interval}
+                  onChange={(e) => setIntervalN(Math.max(1, Number(e.target.value) || 1))}
+                  className="w-16"
+                />
+                <Select value={freq} onValueChange={(v) => setFreq(v as RepeatFreq)}>
+                  <SelectTrigger className="flex-1"><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    {REPEAT_FREQS.map((f) => (
+                      <SelectItem key={f} value={f}>{interval === 1 ? t(`events.freqOne.${f}` as const) : t(`events.freq.${f}` as const)}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
           </div>
 
           <div className="grid gap-1.5">
