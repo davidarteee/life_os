@@ -9,6 +9,7 @@ export type WidgetId =
   | "hero-stats"
   | "today-habits"
   | "today-tasks"
+  | "today-events"
   | "task-inbox"
   | "calendar"
   | "gamification"
@@ -36,6 +37,7 @@ export interface WidgetMeta {
 export const WIDGETS: WidgetMeta[] = [
   { id: "hero-stats", title: "Overview", span: 12, minSpan: 12, maxSpan: 12, resizable: false },
   { id: "today-tasks", title: "Today's tasks", span: 4, minSpan: 3, maxSpan: 6, resizable: true },
+  { id: "today-events", title: "Today's events", span: 4, minSpan: 3, maxSpan: 6, resizable: true },
   { id: "today-habits", title: "Today's habits", span: 5, minSpan: 4, maxSpan: 8, resizable: true },
   { id: "task-inbox", title: "Inbox", span: 3, minSpan: 3, maxSpan: 6, resizable: true },
   { id: "calendar", title: "Calendar", span: 4, minSpan: 3, maxSpan: 6, resizable: true },
@@ -58,6 +60,7 @@ export const WIDGET_META = new Map(WIDGETS.map((w) => [w.id, w]));
 export const DEFAULT_WIDGET_ORDER: WidgetId[] = [
   "hero-stats",
   "today-tasks",
+  "today-events",
   "today-habits",
   "calendar",
   "task-inbox",

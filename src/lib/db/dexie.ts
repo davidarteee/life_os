@@ -13,6 +13,7 @@ import type {
   Food,
   FoodEntry,
   Workout,
+  Event,
 } from "@/lib/types";
 
 /**
@@ -48,7 +49,8 @@ export type SyncTable =
   | "tasks"
   | "foods"
   | "food_entries"
-  | "workouts";
+  | "workouts"
+  | "events";
 
 export class LifeOSDatabase extends Dexie {
   habits!: Table<Habit, string>;
@@ -64,6 +66,7 @@ export class LifeOSDatabase extends Dexie {
   foods!: Table<Food, string>;
   foodEntries!: Table<FoodEntry, string>;
   workouts!: Table<Workout, string>;
+  events!: Table<Event, string>;
   mutations!: Table<Mutation, string>;
 
   constructor() {
@@ -89,6 +92,10 @@ export class LifeOSDatabase extends Dexie {
       foods: "id, user_id, favorite, useCount, name, [user_id+favorite]",
       foodEntries: "id, user_id, day, meal, [user_id+day]",
       workouts: "id, user_id, day, [user_id+day]",
+    });
+    // v4 — Events.
+    this.version(4).stores({
+      events: "id, user_id, date, category, [user_id+date]",
     });
   }
 }

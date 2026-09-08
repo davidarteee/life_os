@@ -1,7 +1,7 @@
 import type { DictKey } from "@/lib/i18n";
 import type { LucideIcon } from "lucide-react";
 import {
-  LayoutDashboard, Sparkles, ListTodo, FolderKanban, CalendarDays, GraduationCap, StickyNote,
+  LayoutDashboard, Sparkles, ListTodo, CalendarClock, FolderKanban, CalendarDays, GraduationCap, StickyNote,
   CircleCheckBig, Apple, Dumbbell, Moon, Target, Lightbulb, BookOpen, Clapperboard, Music,
   Users, Plane, Gift, LineChart, Wallet, Gamepad2, Trophy, Database, Settings,
 } from "lucide-react";
@@ -31,6 +31,7 @@ export const NAV: NavSection[] = [
     labelKey: "nav.section.productivity",
     items: [
       { href: "/tasks", labelKey: "nav.tasks", icon: ListTodo, ready: true },
+      { href: "/events", labelKey: "nav.events", icon: CalendarClock, ready: true },
       { href: "/projects", labelKey: "nav.projects", icon: FolderKanban },
       { href: "/calendar", labelKey: "nav.calendar", icon: CalendarDays, ready: true },
       { href: "/study", labelKey: "nav.study", icon: GraduationCap },

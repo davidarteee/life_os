@@ -4,8 +4,11 @@ import { useMemo, useState } from "react";
 import { ChevronLeft, ChevronRight, Plus } from "lucide-react";
 import { monthGrid, groupByDay, type CalendarItem } from "@/lib/calendar/calendar";
 import { useCalendarItems, useTasksForDay } from "@/hooks/use-tasks";
+import { useEventsForDay } from "@/hooks/use-events";
 import { TaskList } from "@/components/tasks/task-list";
 import { TaskForm } from "@/components/tasks/task-form";
+import { EventList } from "@/components/events/event-list";
+import { EventForm } from "@/components/events/event-form";
 import { PRIORITY } from "@/components/tasks/priority";
 import { ACCENT } from "@/lib/domain-colors";
 import { dayKey, fromDayKey, WEEKDAY_KEYS } from "@/lib/date";
@@ -13,7 +16,7 @@ import { useT } from "@/hooks/use-t";
 import { useLocaleStore } from "@/stores/locale-store";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import type { Task } from "@/lib/types";
+import type { Task, Event as EventType } from "@/lib/types";
 import { cn } from "@/lib/utils";
 
 function itemDot(item: CalendarItem): string {
@@ -108,26 +111,50 @@ function DayPanel({ day }: { day: string }) {
   const { t } = useT();
   const locale = useLocaleStore((s) => s.locale);
   const tasks = useTasksForDay(day);
+  const events = useEventsForDay(day);
   const [formOpen, setFormOpen] = useState(false);
   const [editTask, setEditTask] = useState<Task | undefined>();
+  const [eventFormOpen, setEventFormOpen] = useState(false);
+  const [editEvent, setEditEvent] = useState<EventType | undefined>();
   const label = fromDayKey(day).toLocaleDateString(locale, { weekday: "long", day: "numeric", month: "long" });
 
   return (
-    <Card className="flex flex-col p-4">
-      <div className="mb-3 flex items-center justify-between gap-2">
+    <Card className="flex flex-col gap-4 p-4">
+      <div className="flex flex-wrap items-center justify-between gap-2">
         <p className="font-heading text-sm font-semibold first-letter:uppercase">{label}</p>
-        <Button size="sm" variant="secondary" className="gap-1" onClick={() => { setEditTask(undefined); setFormOpen(true); }}>
-          <Plus className="size-4" /> {t("tasks.new")}
-        </Button>
+        <div className="flex gap-1.5">
+          <Button size="sm" variant="secondary" className="gap-1" onClick={() => { setEditTask(undefined); setFormOpen(true); }}>
+            <Plus className="size-4" /> {t("tasks.new")}
+          </Button>
+          <Button size="sm" variant="secondary" className="gap-1" onClick={() => { setEditEvent(undefined); setEventFormOpen(true); }}>
+            <Plus className="size-4" /> {t("events.new")}
+          </Button>
+        </div>
       </div>
-      <TaskList
-        tasks={tasks}
-        onEdit={(task) => { setEditTask(task); setFormOpen(true); }}
-        emptyText={t("calendar.noItems")}
-        showDate={false}
-        reorderable={false}
-      />
+
+      <div>
+        <p className="mb-1.5 text-xs font-semibold uppercase tracking-wide text-muted-foreground">{t("nav.events")}</p>
+        <EventList
+          events={events}
+          onEdit={(e) => { setEditEvent(e); setEventFormOpen(true); }}
+          emptyText={t("events.emptyDay")}
+          showDate={false}
+        />
+      </div>
+
+      <div>
+        <p className="mb-1.5 text-xs font-semibold uppercase tracking-wide text-muted-foreground">{t("nav.tasks")}</p>
+        <TaskList
+          tasks={tasks}
+          onEdit={(task) => { setEditTask(task); setFormOpen(true); }}
+          emptyText={t("calendar.noItems")}
+          showDate={false}
+          reorderable={false}
+        />
+      </div>
+
       <TaskForm open={formOpen} onOpenChange={setFormOpen} task={editTask} defaultDate={day} />
+      <EventForm open={eventFormOpen} onOpenChange={setEventFormOpen} event={editEvent} defaultDate={day} />
     </Card>
   );
 }

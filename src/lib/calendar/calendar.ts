@@ -2,6 +2,7 @@ import type { DayKey, TaskPriority } from "@/lib/types";
 import type { AccentKey } from "@/lib/domain-colors";
 import { dayKey, addDays, weekdayIndex } from "@/lib/date";
 import { tasksCalendarItems } from "@/lib/data/tasks";
+import { eventsCalendarItems } from "@/lib/data/events";
 
 /**
  * The unified LifeOS calendar. There is ONE central calendar; each module that
@@ -29,6 +30,7 @@ export interface CalendarItem {
 export async function collectCalendarItems(userId: string): Promise<CalendarItem[]> {
   const groups = await Promise.all([
     tasksCalendarItems(userId).catch(() => []),
+    eventsCalendarItems(userId).catch(() => []),
     // Future modules register here, e.g. studyCalendarItems(userId), contactsBirthdays(userId)…
   ]);
   return groups.flat();

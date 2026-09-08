@@ -81,6 +81,25 @@ export interface Task extends OwnedRecord {
   order: number;
 }
 
+/* ---------------------------------------------------------------- Events -- */
+
+/** Event categories double as the color-coded "sections" in the UI. */
+export type EventCategory = "exam" | "medical" | "important" | "personal" | "social" | "other";
+export const EVENT_CATEGORIES: EventCategory[] = ["exam", "medical", "important", "personal", "social", "other"];
+
+/**
+ * A dated thing to remember — an exam, a doctor's appointment, an important
+ * date. Unlike a Task it has no priority and isn't "completed"; it just happens
+ * on its day. It surfaces on the unified Calendar, colored by its category.
+ */
+export interface Event extends OwnedRecord {
+  title: string;
+  date: DayKey; // the day it happens (YYYY-MM-DD)
+  time?: string; // optional HH:MM
+  category: EventCategory;
+  notes?: string;
+}
+
 /* ------------------------------------------------------------ Nutrition -- */
 
 export type MealSlot = "breakfast" | "midmorning" | "lunch" | "snack" | "dinner";
