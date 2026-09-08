@@ -12,6 +12,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
+import { CalendarViews } from "@/components/calendar/calendar-views";
 import { useInbox, useToday, useAllTasks, useTaskStats } from "@/hooks/use-tasks";
 import { useSession } from "@/components/providers/session-provider";
 import { createTask } from "@/lib/data/tasks";
@@ -138,6 +139,11 @@ export default function TasksPage() {
           </Card>
         </TabsContent>
       </Tabs>
+
+      <div className="mt-8">
+        <h2 className="mb-3 font-heading text-lg font-semibold">{t("calendar.title")}</h2>
+        <CalendarViews defaultView="month" />
+      </div>
 
       <TaskForm open={formOpen} onOpenChange={setFormOpen} task={editTask} />
     </PageContainer>

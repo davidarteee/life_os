@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { EventList, EventItem } from "@/components/events/event-list";
 import { EventForm } from "@/components/events/event-form";
+import { CalendarViews } from "@/components/calendar/calendar-views";
 import { EVENT_CATEGORY } from "@/components/events/category";
 import { EVENT_CATEGORIES } from "@/lib/types";
 import { useAllEvents, useEventsForDay, useUpcomingEvents, useEventStats } from "@/hooks/use-events";
@@ -101,6 +102,11 @@ export default function EventsPage() {
           )}
         </TabsContent>
       </Tabs>
+
+      <div className="mt-8">
+        <h2 className="mb-3 font-heading text-lg font-semibold">{t("calendar.title")}</h2>
+        <CalendarViews defaultView="month" />
+      </div>
 
       <EventForm open={formOpen} onOpenChange={setFormOpen} event={editEvent} />
     </PageContainer>

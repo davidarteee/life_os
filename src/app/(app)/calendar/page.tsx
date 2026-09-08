@@ -2,7 +2,7 @@
 
 import { CalendarDays } from "lucide-react";
 import { PageContainer, PageHeader } from "@/components/layout/page-container";
-import { MonthCalendar } from "@/components/calendar/month-calendar";
+import { CalendarViews } from "@/components/calendar/calendar-views";
 import { useT } from "@/hooks/use-t";
 
 export default function CalendarPage() {
@@ -10,7 +10,7 @@ export default function CalendarPage() {
   return (
     <PageContainer wide>
       <PageHeader title={t("calendar.title")} description={t("calendar.subtitle")} icon={<CalendarDays className="size-5" />} />
-      <MonthCalendar />
+      <CalendarViews defaultView="month" />
     </PageContainer>
   );
 }

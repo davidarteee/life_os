@@ -10,6 +10,7 @@ import { useGameState } from "@/hooks/use-game";
 import { QuickNoteWidget } from "@/components/dashboard/widgets/quick-note";
 import { PomodoroWidget } from "@/components/dashboard/widgets/pomodoro";
 import { MonthOverviewWidget } from "@/components/dashboard/widgets/month-overview";
+import { WeekOverviewWidget } from "@/components/dashboard/widgets/week-overview";
 import { StreaksWidget, LivesWidget, ComingSoonMini } from "@/components/dashboard/widgets/small-widgets";
 import { TodayTasksWidget, TaskInboxWidget, MiniCalendarWidget } from "@/components/dashboard/widgets/task-widgets";
 import { TodayEventsWidget } from "@/components/dashboard/widgets/events-widget";
@@ -52,6 +53,8 @@ export function WidgetContent({ id }: { id: WidgetId }) {
       return <PomodoroWidget />;
     case "month-overview":
       return <MonthOverviewWidget />;
+    case "week-overview":
+      return <WeekOverviewWidget />;
     case "nutrition-summary":
       return <NutritionSummaryWidget />;
     case "exercise-summary":
