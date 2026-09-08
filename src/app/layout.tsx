@@ -13,7 +13,10 @@ export const metadata: Metadata = {
   description: appMeta.description,
   applicationName: appMeta.name,
   manifest: "/manifest.webmanifest",
-  appleWebApp: { capable: true, statusBarStyle: "black-translucent", title: appMeta.name },
+  // "default" (opaque) keeps the iOS status bar as its own bar so app content
+  // starts BELOW it in the installed PWA — no overlap. Safe-area padding stays
+  // as a belt-and-suspenders for notched/Android cases.
+  appleWebApp: { capable: true, statusBarStyle: "default", title: appMeta.name },
   icons: { icon: "/icons/icon.svg", apple: "/icons/icon.svg" },
 };
 

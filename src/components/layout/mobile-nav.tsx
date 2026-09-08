@@ -14,12 +14,12 @@ export function MobileNav() {
   return (
     <Sheet open={open} onOpenChange={setMobileNav}>
       <SheetContent side="left" className="w-[280px] bg-sidebar p-0">
-        <SheetHeader className="h-16 justify-center border-b border-sidebar-border px-5">
+        <SheetHeader className="min-h-16 justify-center border-b border-sidebar-border px-5 [padding-top:env(safe-area-inset-top)]">
           <SheetTitle asChild>
             <div><Brand /></div>
           </SheetTitle>
         </SheetHeader>
-        <ScrollArea className="h-[calc(100dvh-4rem)]">
+        <ScrollArea className="h-[calc(100dvh-4rem-env(safe-area-inset-top))]">
           <NavList onNavigate={() => setMobileNav(false)} />
           <div className="h-8" />
         </ScrollArea>

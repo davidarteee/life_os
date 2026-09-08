@@ -297,7 +297,7 @@ export const ca: Partial<Record<DictKey, string>> = {
   "settings.resetLocalConfirm": "Això esborra les dades locals d'AQUEST dispositiu i recarrega. Les teves dades al núvol segueixen segures. Vols continuar?",
   "settings.resetLocalDone": "Dades locals esborrades — recarregant…",
   "settings.dedupe": "Elimina duplicats",
-  "settings.dedupeDesc": "Uneix tasques i esdeveniments idèntics (mateix contingut, creats per separat en dos dispositius sense connexió), conservant-ne un de cada.",
+  "settings.dedupeDesc": "Uneix hàbits, tasques i esdeveniments idèntics (mateix contingut, creats per separat en dos dispositius sense connexió), conservant-ne un de cada.",
   "settings.dedupeDone": "S'han eliminat {n} duplicat(s).",
   "settings.dedupeNone": "No s'han trobat duplicats.",
   "settings.resetAll": "Reinicia-ho tot (comença de zero)",

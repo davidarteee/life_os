@@ -297,7 +297,7 @@ export const es: Partial<Record<DictKey, string>> = {
   "settings.resetLocalConfirm": "Esto borra los datos locales de ESTE dispositivo y recarga. Tus datos en la nube siguen a salvo. ¿Continuar?",
   "settings.resetLocalDone": "Datos locales borrados — recargando…",
   "settings.dedupe": "Eliminar duplicados",
-  "settings.dedupeDesc": "Une tareas y eventos idénticos (mismo contenido, creados por separado en dos dispositivos sin conexión), conservando uno de cada.",
+  "settings.dedupeDesc": "Une hábitos, tareas y eventos idénticos (mismo contenido, creados por separado en dos dispositivos sin conexión), conservando uno de cada.",
   "settings.dedupeDone": "Se eliminaron {n} duplicado(s).",
   "settings.dedupeNone": "No se encontraron duplicados.",
   "settings.resetAll": "Reiniciar todo (empezar de cero)",

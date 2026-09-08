@@ -4,6 +4,7 @@ import { describe, it, expect, beforeEach } from "vitest";
 import { resetLocalDatabase } from "@/lib/db/dexie";
 import { createTask, listTasks } from "@/lib/data/tasks";
 import { createEvent, listEvents } from "@/lib/data/events";
+import { createHabit, listHabits } from "@/lib/data/habits";
 import { dedupeUserData } from "@/lib/data/maintenance";
 import { dayKey } from "@/lib/date";
 
@@ -41,10 +42,20 @@ describe("dedupeUserData", () => {
     expect(await listEvents(UID)).toHaveLength(2);
   });
 
+  it("removes identical duplicate habits, keeping the earliest", async () => {
+    await createHabit(UID, { name: "Meditate" });
+    await tick();
+    await createHabit(UID, { name: "Meditate" }); // exact dup
+    await createHabit(UID, { name: "Run" });
+    const res = await dedupeUserData(UID);
+    expect(res.habits).toBe(1);
+    expect(await listHabits(UID)).toHaveLength(2);
+  });
+
   it("does nothing when there are no duplicates", async () => {
     await createTask(UID, { title: "A" });
     await createTask(UID, { title: "B" });
-    expect(await dedupeUserData(UID)).toEqual({ tasks: 0, events: 0 });
+    expect(await dedupeUserData(UID)).toEqual({ tasks: 0, events: 0, habits: 0 });
   });
 
   it("never touches another user's records", async () => {

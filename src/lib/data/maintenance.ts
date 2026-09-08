@@ -2,7 +2,8 @@ import { db } from "@/lib/db/dexie";
 import { activeRecords } from "@/lib/data/repository";
 import { deleteTask } from "@/lib/data/tasks";
 import { deleteEvent } from "@/lib/data/events";
-import type { Task, Event } from "@/lib/types";
+import { deleteHabit } from "@/lib/data/habits";
+import type { Task, Event, Habit } from "@/lib/types";
 
 /**
  * Collapse exact-duplicate tasks and events for a user — same content, different
@@ -34,15 +35,21 @@ const taskKey = (t: Task) =>
 const eventKey = (e: Event) =>
   [e.title.trim().toLowerCase(), e.date, e.time ?? "", e.category, e.repeat?.freq ?? "", e.repeat?.interval ?? ""].join("|");
 
-export async function dedupeUserData(userId: string): Promise<{ tasks: number; events: number }> {
+const habitKey = (h: Habit) =>
+  [h.name.trim().toLowerCase(), h.cadence, [...h.customDays].sort().join(","), h.target, h.required].join("|");
+
+export async function dedupeUserData(userId: string): Promise<{ tasks: number; events: number; habits: number }> {
   const tasks = activeRecords(await db().tasks.where("user_id").equals(userId).toArray());
   const events = activeRecords(await db().events.where("user_id").equals(userId).toArray());
+  const habits = activeRecords(await db().habits.where("user_id").equals(userId).toArray());
 
   const dupTasks = keepEarliest(tasks, taskKey);
   const dupEvents = keepEarliest(events, eventKey);
+  const dupHabits = keepEarliest(habits, habitKey);
 
   for (const t of dupTasks) await deleteTask(userId, t.id);
   for (const e of dupEvents) await deleteEvent(userId, e.id);
+  for (const h of dupHabits) await deleteHabit(userId, h.id);
 
-  return { tasks: dupTasks.length, events: dupEvents.length };
+  return { tasks: dupTasks.length, events: dupEvents.length, habits: dupHabits.length };
 }

@@ -311,7 +311,7 @@ export const en = {
   "settings.resetLocalConfirm": "This clears local data on THIS device and reloads. Your cloud data stays safe. Continue?",
   "settings.resetLocalDone": "Local data cleared — reloading…",
   "settings.dedupe": "Remove duplicates",
-  "settings.dedupeDesc": "Merge identical tasks and events (same content, created separately on two devices while offline), keeping one of each.",
+  "settings.dedupeDesc": "Merge identical habits, tasks and events (same content, created separately on two devices while offline), keeping one of each.",
   "settings.dedupeDone": "Removed {n} duplicate(s).",
   "settings.dedupeNone": "No duplicates found.",
   "settings.resetAll": "Reset everything (start from zero)",

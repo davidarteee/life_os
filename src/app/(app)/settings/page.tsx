@@ -283,8 +283,8 @@ export default function SettingsPage() {
                 className="mt-2"
                 onClick={async () => {
                   if (!user) return;
-                  const { tasks, events } = await dedupeUserData(user.id);
-                  const total = tasks + events;
+                  const { tasks, events, habits } = await dedupeUserData(user.id);
+                  const total = tasks + events + habits;
                   toast.success(total === 0 ? t("settings.dedupeNone") : t("settings.dedupeDone", { n: total }));
                 }}
               >
