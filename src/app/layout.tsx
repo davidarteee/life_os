@@ -17,9 +17,13 @@ export const metadata: Metadata = {
   // starts BELOW it in the installed PWA — no overlap. Safe-area padding stays
   // as a belt-and-suspenders for notched/Android cases.
   appleWebApp: { capable: true, statusBarStyle: "default", title: appMeta.name },
-  // Favicon/tab icon comes from the file convention src/app/icon.svg. Only the
-  // Apple touch icon is declared here.
-  icons: { apple: "/icons/icon.svg" },
+  // Explicit favicon links (plus the file-convention src/app/icon.svg) so every
+  // browser gets a clear rel="icon"/"shortcut icon" pointing at the star SVG.
+  icons: {
+    icon: [{ url: "/icon.svg", type: "image/svg+xml" }],
+    shortcut: [{ url: "/icon.svg", type: "image/svg+xml" }],
+    apple: "/icons/icon.svg",
+  },
 };
 
 export const viewport: Viewport = {
