@@ -1,5 +1,12 @@
 # LifeOS — Current State
 
+> ⚠️ **STALE (Aug 2026, Tasks+Calendar milestone).** Since then LifeOS added
+> Nutrition, Exercise, Events, shared editable Categories (tasks+events, priority
+> removed), Month+Week calendar views with colored chips, gamification reset, a
+> steeper level curve, iOS PWA fixes and more. **`SESSION_HANDOFF.md` has the
+> authoritative current state (2026-09, main ≈ `bf6f536`, 125 tests, migrations
+> 0001–0005).** Trust that file over the specifics below.
+
 _Snapshot as of the Tasks + Calendar milestone. `main` builds clean, tests green, deployed._
 
 ## Git

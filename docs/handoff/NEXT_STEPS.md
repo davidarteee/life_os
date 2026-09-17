@@ -1,6 +1,12 @@
 # LifeOS — Next Steps
 
-## Immediate next module: **Nutrition + Exercise** (in progress)
+> ⚠️ **STALE (Aug 2026).** Nutrition + Exercise, Events and Categories are all
+> DONE now. See `SESSION_HANDOFF.md` for current state. Open ideas going forward:
+> **push notifications** for tasks/events (Web Push + VAPID + a Vercel Cron
+> sender; discussed with the user, not built), Goals (5-year/6-month vision),
+> Study + Pomodoro, a general mobile UI polish pass, and Investments (manual/CSV).
+
+## (historical) Immediate next module: **Nutrition + Exercise** (in progress)
 Full spec: `MODULE_SPECIFICATIONS.md` → "Nutrition + Exercise". A **data‑layer scaffold already exists** on branch `wip/nutrition-exercise` (does not build). Two ways to proceed:
 - **Option A (recommended):** rebuild fresh on `main` following the documented plan (the scaffold is a reference). It's mostly mechanical.
 - **Option B:** cherry‑pick / review the WIP branch files, then finish. Only do this if you re‑verify each file.
