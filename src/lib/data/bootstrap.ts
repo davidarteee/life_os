@@ -3,6 +3,7 @@ import { db } from "@/lib/db/dexie";
 import { activeRecords } from "@/lib/data/repository";
 import { createHabit, type HabitInput } from "@/lib/data/habits";
 import { getGameState, recomputeAchievements } from "@/lib/data/game";
+import { seedDefaultCategories } from "@/lib/data/categories";
 import { getSettings } from "@/lib/data/settings";
 import { runSync } from "@/lib/sync/sync-engine";
 import type { Domain, OwnedRecord } from "@/lib/types";
@@ -98,6 +99,11 @@ export async function ensureUserData(userId: string): Promise<void> {
 
   await getSettings(userId);
   await getGameState(userId);
+
+  // Seed the shared default categories once (idempotent; runs for existing
+  // accounts too, since categories were added after Tasks/Events shipped).
+  const catCount = await db().categories.where("user_id").equals(userId).count();
+  if (catCount === 0) await seedDefaultCategories(userId, useLocaleStore.getState().locale);
 
   const setMarker = () => {
     if (typeof localStorage !== "undefined") localStorage.setItem(BOOTSTRAP_KEY(userId), new Date().toISOString());

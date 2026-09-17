@@ -30,10 +30,10 @@ function keepEarliest<T extends { id: string; created_at: string }>(rows: T[], k
 }
 
 const taskKey = (t: Task) =>
-  [t.title.trim().toLowerCase(), t.date ?? "", t.priority, t.status, (t.notes ?? "").trim()].join("|");
+  [t.title.trim().toLowerCase(), t.date ?? "", t.categoryId ?? "", t.status, (t.notes ?? "").trim()].join("|");
 
 const eventKey = (e: Event) =>
-  [e.title.trim().toLowerCase(), e.date, e.time ?? "", e.category, e.repeat?.freq ?? "", e.repeat?.interval ?? ""].join("|");
+  [e.title.trim().toLowerCase(), e.date, e.time ?? "", e.categoryId ?? "", e.repeat?.freq ?? "", e.repeat?.interval ?? ""].join("|");
 
 const habitKey = (h: Habit) =>
   [h.name.trim().toLowerCase(), h.cadence, [...h.customDays].sort().join(","), h.target, h.required].join("|");

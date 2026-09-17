@@ -13,10 +13,11 @@ const UID = "eeeeeeee-eeee-eeee-eeee-eeeeeeeeeeee";
 const OTHER = "ffffffff-ffff-ffff-ffff-ffffffffffff";
 const TODAY = dayKey();
 
+const CAT = "cat-medico";
 const ev = (over: Partial<EventInput> = {}): EventInput => ({
   title: "Dentist",
   date: TODAY,
-  category: "medico",
+  categoryId: CAT,
   ...over,
 });
 
@@ -25,23 +26,23 @@ beforeEach(async () => {
 });
 
 describe("events — CRUD and defaults", () => {
-  it("creates an event with a category and no priority concept", async () => {
+  it("creates an event with a category id and no priority concept", async () => {
     const e = await createEvent(UID, ev());
-    expect(e.category).toBe("medico");
+    expect(e.categoryId).toBe(CAT);
     expect("priority" in e).toBe(false);
   });
 
-  it("defaults the category to 'otros' when unset", async () => {
+  it("leaves the category id undefined when unset", async () => {
     const e = await createEvent(UID, { title: "Something", date: TODAY });
-    expect(e.category).toBe("otros");
+    expect(e.categoryId).toBeUndefined();
   });
 
   it("edits an event without creating a duplicate", async () => {
     const e = await createEvent(UID, ev());
-    await updateEvent(UID, { ...e, title: "Doctor", category: "personal" });
+    await updateEvent(UID, { ...e, title: "Doctor", categoryId: "cat-personal" });
     const all = await listEvents(UID);
     expect(all).toHaveLength(1);
-    expect(all[0].category).toBe("personal");
+    expect(all[0].categoryId).toBe("cat-personal");
   });
 
   it("soft-deletes (tombstone) and hides from active queries", async () => {
@@ -102,7 +103,7 @@ describe("events — recurrence", () => {
 
 describe("events — calendar contribution", () => {
   it("maps a one-off event to a calendar item colored by category", async () => {
-    await createEvent(UID, ev({ title: "Exam", date: TODAY, time: "10:30", category: "uni" }));
+    await createEvent(UID, ev({ title: "Exam", date: TODAY, time: "10:30", categoryId: "cat-uni" }));
     const items = await eventsCalendarItems(UID);
     expect(items).toHaveLength(1);
     expect(items[0]).toMatchObject({ day: TODAY, kind: "event", accent: "neutral", href: "/events" });

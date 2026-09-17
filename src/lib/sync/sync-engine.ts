@@ -36,6 +36,7 @@ const REGISTRY: Record<SyncTable, TableBinding> = {
   food_entries: { local: () => db().foodEntries as unknown as Table<OwnedRecord, string>, remote: "food_entries" },
   workouts: { local: () => db().workouts as unknown as Table<OwnedRecord, string>, remote: "workouts" },
   events: { local: () => db().events as unknown as Table<OwnedRecord, string>, remote: "events" },
+  categories: { local: () => db().categories as unknown as Table<OwnedRecord, string>, remote: "categories" },
 };
 
 const LAST_PULL_KEY = (userId: string) => `lifeos:lastPull:${userId}`;

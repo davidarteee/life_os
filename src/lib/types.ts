@@ -62,6 +62,19 @@ export interface HabitLog extends OwnedRecord {
   completedAt?: ISODate;
 }
 
+/* ------------------------------------------------------------ Categories -- */
+
+/**
+ * A user-defined, color-coded category shared by Tasks and Events. Editable
+ * (name/color/icon), synced like any other entity. Seeded with a default set.
+ */
+export interface Category extends OwnedRecord {
+  name: string;
+  color: string; // CSS color string
+  icon: string; // lucide icon name
+  order: number;
+}
+
 /* ---------------------------------------------------------------- Tasks -- */
 
 export type TaskPriority = "low" | "medium" | "high";
@@ -70,7 +83,10 @@ export type TaskStatus = "todo" | "done";
 export interface Task extends OwnedRecord {
   title: string;
   notes?: string;
-  priority: TaskPriority;
+  /** Shared category (see {@link Category}). Undefined = uncategorized. */
+  categoryId?: string;
+  /** @deprecated Priority was replaced by categories; kept optional for old records. */
+  priority?: TaskPriority;
   status: TaskStatus;
   /** Scheduled day (YYYY-MM-DD). Undefined = inbox / backlog (no date yet). */
   date?: DayKey;
@@ -109,7 +125,10 @@ export interface Event extends OwnedRecord {
   title: string;
   date: DayKey; // the (first) day it happens (YYYY-MM-DD)
   time?: string; // optional HH:MM
-  category: EventCategory;
+  /** Shared category (see {@link Category}). */
+  categoryId?: string;
+  /** @deprecated Legacy fixed category slug; superseded by categoryId. */
+  category?: EventCategory;
   notes?: string;
   /** Optional recurrence; undefined = one-off. */
   repeat?: EventRepeat;

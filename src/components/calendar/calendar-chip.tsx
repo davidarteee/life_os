@@ -1,16 +1,19 @@
 "use client";
 
+import { SquareCheckBig } from "lucide-react";
 import { calendarItemColor, type CalendarItem } from "@/lib/calendar/calendar";
+import { resolveIcon } from "@/lib/icons";
 import { cn } from "@/lib/utils";
 
 /**
- * A colored calendar entry: a rounded block tinted by the item's category /
- * priority color, with a left accent bar and a readable label. Used across the
- * month and week views (desktop and mobile) so every dated thing shows as a
- * legible colored box instead of a tiny dot.
+ * A colored calendar entry: a rounded block tinted by the item's category color,
+ * with a left accent bar and a readable label. A leading icon distinguishes the
+ * two kinds — tasks show a check box, events show their category icon — so both
+ * can share a color yet still be told apart at a glance.
  */
 export function CalendarChip({ item, className }: { item: CalendarItem; className?: string }) {
   const color = calendarItemColor(item);
+  const Icon = item.kind === "task" ? SquareCheckBig : resolveIcon(item.icon);
   return (
     <div
       className={cn(
@@ -24,6 +27,7 @@ export function CalendarChip({ item, className }: { item: CalendarItem; classNam
       }}
       title={item.title}
     >
+      <Icon className="size-3 shrink-0 opacity-90" />
       <span className={cn("truncate", item.done && "line-through opacity-60")}>{item.title}</span>
     </div>
   );

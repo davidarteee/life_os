@@ -6,7 +6,9 @@ import type { Task } from "@/lib/types";
 import { useSession } from "@/components/providers/session-provider";
 import { useToggleTask } from "@/hooks/use-task-actions";
 import { setTaskDate, deleteTask } from "@/lib/data/tasks";
-import { PRIORITY } from "@/components/tasks/priority";
+import { useCategoryMap } from "@/hooks/use-categories";
+import { resolveCategoryId } from "@/lib/data/categories";
+import { resolveIcon } from "@/lib/icons";
 import { dayKey, shiftDayKey, fromDayKey } from "@/lib/date";
 import { useT } from "@/hooks/use-t";
 import { useLocaleStore } from "@/stores/locale-store";
@@ -31,11 +33,14 @@ export function TaskItem({ task, onEdit, dragHandle, showDate = true }: TaskItem
   const toggle = useToggleTask();
   const { t } = useT();
   const locale = useLocaleStore((s) => s.locale);
+  const cats = useCategoryMap();
   const [dateOpen, setDateOpen] = useState(false);
-  const p = PRIORITY[task.priority];
   const done = task.status === "done";
   if (!user) return null;
   const uid = user.id;
+  const cat = cats.get(resolveCategoryId(uid, task.categoryId));
+  const color = cat?.color ?? "var(--primary)";
+  const CatIcon = resolveIcon(cat?.icon);
 
   const fmt = (d: string) => fromDayKey(d).toLocaleDateString(locale, { day: "numeric", month: "short" });
   const today = dayKey();
@@ -48,9 +53,10 @@ export function TaskItem({ task, onEdit, dragHandle, showDate = true }: TaskItem
   return (
     <div
       className={cn(
-        "group flex items-center gap-2 rounded-xl border border-border/60 bg-card px-2.5 py-2 transition-colors hover:border-border",
+        "group flex items-center gap-2 rounded-xl border border-l-[3px] border-border/60 bg-card px-2.5 py-2 transition-colors hover:border-border",
         done && "opacity-60",
       )}
+      style={{ borderLeftColor: color }}
     >
       {dragHandle}
 
@@ -69,9 +75,11 @@ export function TaskItem({ task, onEdit, dragHandle, showDate = true }: TaskItem
       <div className="min-w-0 flex-1">
         <p className={cn("truncate text-sm", done && "line-through text-muted-foreground")}>{task.title}</p>
         <div className="mt-0.5 flex items-center gap-2 text-[11px] text-muted-foreground">
-          <span className={cn("inline-flex items-center gap-1", p.text)}>
-            <span className={cn("size-1.5 rounded-full", p.dot)} /> {t(p.labelKey)}
-          </span>
+          {cat && (
+            <span className="inline-flex items-center gap-1" style={{ color }}>
+              <CatIcon className="size-3" /> {cat.name}
+            </span>
+          )}
           {showDate && task.date && (
             <span className={cn("inline-flex items-center gap-1", task.date < today && !done && "text-destructive")}>
               <CalendarDays className="size-3" /> {fmt(task.date)}

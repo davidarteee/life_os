@@ -19,10 +19,10 @@ beforeEach(async () => {
 
 describe("dedupeUserData", () => {
   it("removes identical duplicate tasks, keeping the earliest", async () => {
-    const first = await createTask(UID, { title: "Buy milk", priority: "medium" });
+    const first = await createTask(UID, { title: "Buy milk", categoryId: "a" });
     await tick();
-    await createTask(UID, { title: "Buy milk", priority: "medium" }); // exact dup
-    await createTask(UID, { title: "Buy milk", priority: "high" }); // different priority → kept
+    await createTask(UID, { title: "Buy milk", categoryId: "a" }); // exact dup
+    await createTask(UID, { title: "Buy milk", categoryId: "b" }); // different category → kept
 
     const res = await dedupeUserData(UID);
     expect(res.tasks).toBe(1);
@@ -32,10 +32,10 @@ describe("dedupeUserData", () => {
   });
 
   it("removes identical duplicate events, keeping the earliest", async () => {
-    await createEvent(UID, { title: "Dentist", date: TODAY, category: "medico", time: "10:00" });
+    await createEvent(UID, { title: "Dentist", date: TODAY, categoryId: "cat-medico", time: "10:00" });
     await tick();
-    await createEvent(UID, { title: "Dentist", date: TODAY, category: "medico", time: "10:00" }); // dup
-    await createEvent(UID, { title: "Dentist", date: TODAY, category: "medico", time: "18:00" }); // diff time → kept
+    await createEvent(UID, { title: "Dentist", date: TODAY, categoryId: "cat-medico", time: "10:00" }); // dup
+    await createEvent(UID, { title: "Dentist", date: TODAY, categoryId: "cat-medico", time: "18:00" }); // diff time → kept
 
     const res = await dedupeUserData(UID);
     expect(res.events).toBe(1);

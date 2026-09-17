@@ -1,5 +1,6 @@
 import { db } from "@/lib/db/dexie";
 import { upsert, softDelete, makeRecord, activeRecords } from "@/lib/data/repository";
+import { categoryMap, resolveCategoryId } from "@/lib/data/categories";
 import type { Task, TaskPriority, DayKey } from "@/lib/types";
 import { dayKey } from "@/lib/date";
 
@@ -40,7 +41,7 @@ const byOrder = (a: Task, b: Task) => a.order - b.order || a.created_at.localeCo
 export interface TaskInput {
   title: string;
   notes?: string;
-  priority?: TaskPriority;
+  categoryId?: string;
   date?: DayKey;
   dueDate?: DayKey;
 }
@@ -54,7 +55,7 @@ export async function createTask(userId: string, input: TaskInput): Promise<Task
   const task = makeRecord<Task>(userId, {
     title: input.title.trim(),
     notes: input.notes?.trim() || undefined,
-    priority: input.priority ?? "medium",
+    categoryId: input.categoryId,
     status: "todo",
     date: input.date,
     dueDate: input.dueDate,
@@ -104,8 +105,12 @@ export async function reorderTasks(userId: string, orderedIds: string[]): Promis
   }
 }
 
-/** XP awarded for completing a task, by priority (config-driven). */
-export function taskXp(priority: TaskPriority, cfg: { taskLow: number; taskMedium: number; taskHigh: number }): number {
+/**
+ * XP awarded for completing a task. Priority was removed; all tasks now award a
+ * flat rate (the former "medium" value). Legacy tasks that still carry a
+ * priority keep honoring it, so old records are unaffected.
+ */
+export function taskXp(priority: TaskPriority | undefined, cfg: { taskLow: number; taskMedium: number; taskHigh: number }): number {
   return priority === "high" ? cfg.taskHigh : priority === "low" ? cfg.taskLow : cfg.taskMedium;
 }
 
@@ -116,15 +121,21 @@ export function taskXp(priority: TaskPriority, cfg: { taskLow: number; taskMediu
  * aggregates them. See src/lib/calendar/calendar.ts.
  */
 export async function tasksCalendarItems(userId: string) {
-  const tasks = (await listTasks(userId)).filter((t) => !!t.date);
-  return tasks.map((t) => ({
-    id: t.id,
-    day: t.date as DayKey,
-    title: t.title,
-    kind: "task" as const,
-    accent: "productivity" as const,
-    done: t.status === "done",
-    priority: t.priority,
-    href: "/tasks",
-  }));
+  const [tasks, cats] = await Promise.all([listTasks(userId), categoryMap(userId)]);
+  return tasks
+    .filter((t) => !!t.date)
+    .map((t) => {
+      const cat = cats.get(resolveCategoryId(userId, t.categoryId));
+      return {
+        id: t.id,
+        day: t.date as DayKey,
+        title: t.title,
+        kind: "task" as const,
+        accent: "productivity" as const,
+        color: cat?.color ?? "var(--primary)",
+        icon: cat?.icon,
+        done: t.status === "done",
+        href: "/tasks",
+      };
+    });
 }

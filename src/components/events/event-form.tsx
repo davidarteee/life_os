@@ -3,11 +3,12 @@
 import { useEffect, useState } from "react";
 import { Trash2, Repeat } from "lucide-react";
 import { toast } from "sonner";
-import type { Event, EventCategory, RepeatFreq } from "@/lib/types";
-import { EVENT_CATEGORIES, REPEAT_FREQS } from "@/lib/types";
+import type { Event, RepeatFreq } from "@/lib/types";
+import { REPEAT_FREQS } from "@/lib/types";
 import { useSession } from "@/components/providers/session-provider";
 import { createEvent, updateEvent, deleteEvent } from "@/lib/data/events";
-import { EVENT_CATEGORY } from "@/components/events/category";
+import { resolveCategoryId, defaultCategoryId } from "@/lib/data/categories";
+import { CategoryPicker } from "@/components/categories/category-picker";
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -17,7 +18,6 @@ import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { dayKey } from "@/lib/date";
 import { useT } from "@/hooks/use-t";
-import { cn } from "@/lib/utils";
 
 interface EventFormProps {
   open: boolean;
@@ -34,7 +34,7 @@ export function EventForm({ open, onOpenChange, event, defaultDate }: EventFormP
   const [title, setTitle] = useState("");
   const [date, setDate] = useState("");
   const [time, setTime] = useState("");
-  const [category, setCategory] = useState<EventCategory>("personal");
+  const [categoryId, setCategoryId] = useState("");
   const [notes, setNotes] = useState("");
   const [repeatOn, setRepeatOn] = useState(false);
   const [freq, setFreq] = useState<RepeatFreq>("weekly");
@@ -47,7 +47,7 @@ export function EventForm({ open, onOpenChange, event, defaultDate }: EventFormP
     setTitle(event?.title ?? "");
     setDate(event?.date ?? defaultDate ?? dayKey());
     setTime(event?.time ?? "");
-    setCategory((event?.category as EventCategory) ?? "personal");
+    setCategoryId(user ? (event ? resolveCategoryId(user.id, event.categoryId, event.category) : defaultCategoryId(user.id)) : "");
     setNotes(event?.notes ?? "");
     setRepeatOn(!!event?.repeat);
     setFreq(event?.repeat?.freq ?? "weekly");
@@ -60,7 +60,7 @@ export function EventForm({ open, onOpenChange, event, defaultDate }: EventFormP
   async function onSave() {
     if (!title.trim() || !date) return;
     const repeat = repeatOn ? { freq, interval: Math.max(1, Math.floor(interval)) } : undefined;
-    const payload = { title: title.trim(), date, time: time || undefined, category, notes: notes.trim() || undefined, repeat };
+    const payload = { title: title.trim(), date, time: time || undefined, categoryId, notes: notes.trim() || undefined, repeat };
     if (editing && event) {
       await updateEvent(uid, { ...event, ...payload });
     } else {
@@ -90,29 +90,7 @@ export function EventForm({ open, onOpenChange, event, defaultDate }: EventFormP
             />
           </div>
 
-          <div className="grid gap-1.5">
-            <Label>{t("events.category")}</Label>
-            <div className="grid grid-cols-3 gap-1.5">
-              {EVENT_CATEGORIES.map((c) => {
-                const meta = EVENT_CATEGORY[c];
-                const Icon = meta.icon;
-                const active = category === c;
-                return (
-                  <button
-                    key={c}
-                    onClick={() => setCategory(c)}
-                    className={cn(
-                      "flex items-center gap-1.5 rounded-lg border px-2 py-2 text-xs transition-colors",
-                      active ? "font-medium" : "border-border/60 text-muted-foreground hover:bg-muted",
-                    )}
-                    style={active ? { borderColor: meta.color, background: `color-mix(in oklch, ${meta.color} 14%, transparent)`, color: meta.color } : undefined}
-                  >
-                    <Icon className="size-3.5 shrink-0" /> <span className="truncate">{t(meta.labelKey)}</span>
-                  </button>
-                );
-              })}
-            </div>
-          </div>
+          <CategoryPicker value={categoryId} onChange={setCategoryId} />
 
           <div className="grid grid-cols-2 gap-3">
             <div className="grid gap-1.5">

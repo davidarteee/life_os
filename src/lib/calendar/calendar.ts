@@ -20,8 +20,10 @@ export interface CalendarItem {
   title: string;
   kind: CalendarKind;
   accent: AccentKey;
-  /** Explicit CSS color that overrides the accent-derived color (e.g. event categories). */
+  /** Explicit CSS color that overrides the accent-derived color (e.g. categories). */
   color?: string;
+  /** Category icon name (lucide) for events; tasks render a check instead. */
+  icon?: string;
   done?: boolean;
   priority?: TaskPriority;
   /** Where clicking the item should navigate (the owning module). */

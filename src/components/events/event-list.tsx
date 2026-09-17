@@ -2,9 +2,11 @@
 
 import { Clock, Repeat } from "lucide-react";
 import type { Event, DayKey } from "@/lib/types";
-import { catMeta } from "@/components/events/category";
+import { useUserId } from "@/components/providers/session-provider";
+import { useCategoryMap } from "@/hooks/use-categories";
+import { resolveCategoryId } from "@/lib/data/categories";
+import { resolveIcon } from "@/lib/icons";
 import { fromDayKey } from "@/lib/date";
-import { useT } from "@/hooks/use-t";
 import { useLocaleStore } from "@/stores/locale-store";
 
 /** A single event row: category-colored icon, title, when, and notes preview. */
@@ -20,10 +22,12 @@ export function EventItem({
   /** Override the shown date (e.g. a recurrence's next occurrence). */
   displayDate?: DayKey;
 }) {
-  const { t } = useT();
   const locale = useLocaleStore((s) => s.locale);
-  const meta = catMeta(event.category);
-  const Icon = meta.icon;
+  const uid = useUserId();
+  const cats = useCategoryMap();
+  const cat = cats.get(resolveCategoryId(uid ?? "", event.categoryId, event.category));
+  const color = cat?.color ?? "var(--primary)";
+  const Icon = resolveIcon(cat?.icon);
   const dateLabel = fromDayKey(displayDate ?? event.date).toLocaleDateString(locale, { weekday: "short", day: "numeric", month: "short" });
 
   return (
@@ -33,7 +37,7 @@ export function EventItem({
     >
       <span
         className="grid size-9 shrink-0 place-items-center rounded-xl"
-        style={{ background: `color-mix(in oklch, ${meta.color} 16%, transparent)`, color: meta.color }}
+        style={{ background: `color-mix(in oklch, ${color} 16%, transparent)`, color }}
       >
         <Icon className="size-4" />
       </span>
@@ -45,9 +49,11 @@ export function EventItem({
         <p className="flex items-center gap-1.5 text-[11px] capitalize text-muted-foreground">
           {showDate && <span>{dateLabel}</span>}
           {event.time && <span className="inline-flex items-center gap-0.5"><Clock className="size-3" /> {event.time}</span>}
-          <span className="rounded-full px-1.5 py-px text-[10px] lowercase" style={{ background: `color-mix(in oklch, ${meta.color} 16%, transparent)`, color: meta.color }}>
-            {t(meta.labelKey)}
-          </span>
+          {cat && (
+            <span className="rounded-full px-1.5 py-px text-[10px]" style={{ background: `color-mix(in oklch, ${color} 16%, transparent)`, color }}>
+              {cat.name}
+            </span>
+          )}
         </p>
         {event.notes && <p className="mt-0.5 truncate text-[11px] text-muted-foreground/80">{event.notes}</p>}
       </div>

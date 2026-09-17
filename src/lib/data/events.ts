@@ -1,9 +1,9 @@
 import { db } from "@/lib/db/dexie";
 import { upsert, softDelete, makeRecord, activeRecords } from "@/lib/data/repository";
-import { categoryColor } from "@/lib/data/event-meta";
+import { categoryMap, resolveCategoryId } from "@/lib/data/categories";
 import { occursOn, nextOccurrence, occurrencesInRange } from "@/lib/data/recurrence";
 import { dayKey, shiftDayKey } from "@/lib/date";
-import type { Event, EventCategory, EventRepeat, DayKey } from "@/lib/types";
+import type { Event, EventRepeat, DayKey } from "@/lib/types";
 
 const eventOpts = (userId: string) => ({ table: db().events, syncTable: "events" as const, userId });
 
@@ -46,7 +46,7 @@ export interface EventInput {
   title: string;
   date: DayKey;
   time?: string;
-  category?: EventCategory;
+  categoryId?: string;
   notes?: string;
   repeat?: EventRepeat;
 }
@@ -56,7 +56,7 @@ export async function createEvent(userId: string, input: EventInput): Promise<Ev
     title: input.title.trim(),
     date: input.date,
     time: input.time || undefined,
-    category: input.category ?? "otros",
+    categoryId: input.categoryId,
     notes: input.notes?.trim() || undefined,
     repeat: input.repeat,
   });
@@ -79,16 +79,18 @@ export async function deleteEvent(userId: string, id: string): Promise<void> {
 export async function eventsCalendarItems(userId: string) {
   const from = shiftDayKey(dayKey(), -186); // ~6 months back
   const to = shiftDayKey(dayKey(), 550); // ~18 months ahead
-  const events = await listEvents(userId);
-  return events.flatMap((e) =>
-    occurrencesInRange(e, from, to).map((day) => ({
+  const [events, cats] = await Promise.all([listEvents(userId), categoryMap(userId)]);
+  return events.flatMap((e) => {
+    const cat = cats.get(resolveCategoryId(userId, e.categoryId, e.category));
+    return occurrencesInRange(e, from, to).map((day) => ({
       id: e.repeat ? `${e.id}:${day}` : e.id,
       day,
       title: e.time ? `${e.time} ${e.title}` : e.title,
       kind: "event" as const,
       accent: "neutral" as const,
-      color: categoryColor(e.category),
+      color: cat?.color ?? "var(--primary)",
+      icon: cat?.icon,
       href: "/events",
-    })),
-  );
+    }));
+  });
 }

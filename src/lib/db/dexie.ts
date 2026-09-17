@@ -14,6 +14,7 @@ import type {
   FoodEntry,
   Workout,
   Event,
+  Category,
 } from "@/lib/types";
 
 /**
@@ -50,7 +51,8 @@ export type SyncTable =
   | "foods"
   | "food_entries"
   | "workouts"
-  | "events";
+  | "events"
+  | "categories";
 
 export class LifeOSDatabase extends Dexie {
   habits!: Table<Habit, string>;
@@ -67,6 +69,7 @@ export class LifeOSDatabase extends Dexie {
   foodEntries!: Table<FoodEntry, string>;
   workouts!: Table<Workout, string>;
   events!: Table<Event, string>;
+  categories!: Table<Category, string>;
   mutations!: Table<Mutation, string>;
 
   constructor() {
@@ -96,6 +99,10 @@ export class LifeOSDatabase extends Dexie {
     // v4 — Events.
     this.version(4).stores({
       events: "id, user_id, date, category, [user_id+date]",
+    });
+    // v5 — shared Categories (tasks + events).
+    this.version(5).stores({
+      categories: "id, user_id, order",
     });
   }
 }

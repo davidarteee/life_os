@@ -23,7 +23,7 @@ describe("tasks — capture → inbox → schedule → complete", () => {
     expect(inbox).toHaveLength(1);
     expect(inbox[0].date).toBeUndefined();
     expect(inbox[0].status).toBe("todo");
-    expect(inbox[0].priority).toBe("medium");
+    expect(inbox[0].categoryId).toBeUndefined();
   });
 
   it("scheduling moves a task out of the inbox onto its day", async () => {
@@ -68,10 +68,11 @@ describe("tasks — capture → inbox → schedule → complete", () => {
 describe("tasks — calendar contribution", () => {
   it("only dated tasks appear on the calendar, mapped to items", async () => {
     await createTask(UID, { title: "No date" });
-    await createTask(UID, { title: "Dated", date: TODAY, priority: "high" });
+    await createTask(UID, { title: "Dated", date: TODAY });
     const items = await tasksCalendarItems(UID);
     expect(items).toHaveLength(1);
-    expect(items[0]).toMatchObject({ day: TODAY, kind: "task", priority: "high", href: "/tasks" });
+    expect(items[0]).toMatchObject({ day: TODAY, kind: "task", href: "/tasks" });
+    expect(typeof items[0].color).toBe("string");
   });
 
   it("tasksInRange filters by day-key window", async () => {

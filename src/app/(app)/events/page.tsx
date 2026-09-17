@@ -10,18 +10,22 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { EventList, EventItem } from "@/components/events/event-list";
 import { EventForm } from "@/components/events/event-form";
 import { CalendarViews } from "@/components/calendar/calendar-views";
-import { EVENT_CATEGORY } from "@/components/events/category";
-import { EVENT_CATEGORIES } from "@/lib/types";
 import { useAllEvents, useEventsForDay, useUpcomingEvents, useEventStats } from "@/hooks/use-events";
+import { useCategories } from "@/hooks/use-categories";
+import { useUserId } from "@/components/providers/session-provider";
+import { resolveCategoryId } from "@/lib/data/categories";
+import { resolveIcon } from "@/lib/icons";
 import type { Event } from "@/lib/types";
 import { useT } from "@/hooks/use-t";
 
 export default function EventsPage() {
   const { t } = useT();
+  const uid = useUserId() ?? "";
   const stats = useEventStats();
   const all = useAllEvents();
   const today = useEventsForDay();
   const upcoming = useUpcomingEvents();
+  const categories = useCategories();
 
   const [formOpen, setFormOpen] = useState(false);
   const [editEvent, setEditEvent] = useState<Event | undefined>();
@@ -29,10 +33,12 @@ export default function EventsPage() {
   function openNew() { setEditEvent(undefined); setFormOpen(true); }
   function openEdit(e: Event) { setEditEvent(e); setFormOpen(true); }
 
-  // Group all events into color-coded sections by category.
+  // Group all events into color-coded sections by the user's categories.
   const sections = useMemo(
-    () => EVENT_CATEGORIES.map((c) => ({ category: c, events: all.filter((e) => e.category === c) })).filter((s) => s.events.length > 0),
-    [all],
+    () => categories
+      .map((cat) => ({ cat, events: all.filter((e) => resolveCategoryId(uid, e.categoryId, e.category) === cat.id) }))
+      .filter((s) => s.events.length > 0),
+    [all, categories, uid],
   );
 
   return (
@@ -84,13 +90,12 @@ export default function EventsPage() {
             </CardContent></Card>
           ) : (
             <div className="flex flex-col gap-4">
-              {sections.map(({ category, events }) => {
-                const meta = EVENT_CATEGORY[category];
-                const Icon = meta.icon;
+              {sections.map(({ cat, events }) => {
+                const Icon = resolveIcon(cat.icon);
                 return (
-                  <Card key={category}><CardContent className="pt-5">
-                    <p className="mb-3 flex items-center gap-2 text-xs font-semibold uppercase tracking-wide" style={{ color: meta.color }}>
-                      <Icon className="size-4" /> {t(meta.labelKey)} <span className="text-muted-foreground/60">· {events.length}</span>
+                  <Card key={cat.id}><CardContent className="pt-5">
+                    <p className="mb-3 flex items-center gap-2 text-xs font-semibold uppercase tracking-wide" style={{ color: cat.color }}>
+                      <Icon className="size-4" /> {cat.name} <span className="text-muted-foreground/60">· {events.length}</span>
                     </p>
                     <div className="flex flex-col gap-1.5">
                       {events.map((e) => <EventItem key={e.id} event={e} onEdit={openEdit} />)}

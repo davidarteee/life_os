@@ -1,18 +1,18 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Trash2 } from "lucide-react";
-import type { Task, TaskPriority } from "@/lib/types";
+import type { Task } from "@/lib/types";
 import { useSession } from "@/components/providers/session-provider";
 import { createTask, updateTask, deleteTask } from "@/lib/data/tasks";
-import { PRIORITY, PRIORITY_ORDER } from "@/components/tasks/priority";
+import { resolveCategoryId, defaultCategoryId } from "@/lib/data/categories";
+import { CategoryPicker } from "@/components/categories/category-picker";
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useT } from "@/hooks/use-t";
-import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 
 interface TaskFormProps {
@@ -28,11 +28,21 @@ export function TaskForm({ open, onOpenChange, task, defaultDate }: TaskFormProp
   const { t } = useT();
   const editing = !!task;
 
-  const [title, setTitle] = useState(task?.title ?? "");
-  const [notes, setNotes] = useState(task?.notes ?? "");
-  const [priority, setPriority] = useState<TaskPriority>(task?.priority ?? "medium");
-  const [date, setDate] = useState(task?.date ?? defaultDate ?? "");
-  const [dueDate, setDueDate] = useState(task?.dueDate ?? "");
+  const [title, setTitle] = useState("");
+  const [notes, setNotes] = useState("");
+  const [categoryId, setCategoryId] = useState("");
+  const [date, setDate] = useState("");
+  const [dueDate, setDueDate] = useState("");
+
+  // Re-sync to the task being edited when the dialog opens (reused instance).
+  useEffect(() => {
+    if (!open) return;
+    setTitle(task?.title ?? "");
+    setNotes(task?.notes ?? "");
+    setCategoryId(user ? (task ? resolveCategoryId(user.id, task.categoryId) : defaultCategoryId(user.id)) : "");
+    setDate(task?.date ?? defaultDate ?? "");
+    setDueDate(task?.dueDate ?? "");
+  }, [open, task, defaultDate, user]);
 
   if (!user) return null;
   const uid = user.id;
@@ -44,7 +54,7 @@ export function TaskForm({ open, onOpenChange, task, defaultDate }: TaskFormProp
         ...task,
         title: title.trim(),
         notes: notes.trim() || undefined,
-        priority,
+        categoryId,
         date: date || undefined,
         dueDate: dueDate || undefined,
       });
@@ -52,7 +62,7 @@ export function TaskForm({ open, onOpenChange, task, defaultDate }: TaskFormProp
       await createTask(uid, {
         title,
         notes: notes || undefined,
-        priority,
+        categoryId,
         date: date || undefined,
         dueDate: dueDate || undefined,
       });
@@ -63,7 +73,7 @@ export function TaskForm({ open, onOpenChange, task, defaultDate }: TaskFormProp
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent className="max-h-[90dvh] overflow-y-auto sm:max-w-md">
         <DialogHeader>
           <DialogTitle>{editing ? t("tasks.edit") : t("tasks.new")}</DialogTitle>
         </DialogHeader>
@@ -81,23 +91,7 @@ export function TaskForm({ open, onOpenChange, task, defaultDate }: TaskFormProp
             />
           </div>
 
-          <div className="grid gap-1.5">
-            <Label>{t("tasks.priority")}</Label>
-            <div className="flex gap-1.5">
-              {PRIORITY_ORDER.map((pr) => (
-                <button
-                  key={pr}
-                  onClick={() => setPriority(pr)}
-                  className={cn(
-                    "flex flex-1 items-center justify-center gap-1.5 rounded-lg border py-2 text-sm transition-colors",
-                    priority === pr ? "border-primary bg-primary/10" : "border-border/60 text-muted-foreground hover:bg-muted",
-                  )}
-                >
-                  <span className={cn("size-2 rounded-full", PRIORITY[pr].dot)} /> {t(PRIORITY[pr].labelKey)}
-                </button>
-              ))}
-            </div>
-          </div>
+          <CategoryPicker value={categoryId} onChange={setCategoryId} />
 
           <div className="grid grid-cols-2 gap-3">
             <div className="grid gap-1.5">

@@ -6,7 +6,6 @@ import { PageContainer, PageHeader } from "@/components/layout/page-container";
 import { StatTile } from "@/components/common/stat-tile";
 import { TaskList } from "@/components/tasks/task-list";
 import { TaskForm } from "@/components/tasks/task-form";
-import { PRIORITY } from "@/components/tasks/priority";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -16,9 +15,8 @@ import { CalendarViews } from "@/components/calendar/calendar-views";
 import { useInbox, useToday, useAllTasks, useTaskStats } from "@/hooks/use-tasks";
 import { useSession } from "@/components/providers/session-provider";
 import { createTask } from "@/lib/data/tasks";
-import type { Task, TaskPriority } from "@/lib/types";
+import type { Task } from "@/lib/types";
 import { useT } from "@/hooks/use-t";
-import { cn } from "@/lib/utils";
 
 export default function TasksPage() {
   const { t } = useT();
@@ -32,7 +30,6 @@ export default function TasksPage() {
   const [editTask, setEditTask] = useState<Task | undefined>();
   const [quick, setQuick] = useState("");
   const [search, setSearch] = useState("");
-  const [filter, setFilter] = useState<TaskPriority | "all">("all");
 
   function openNew() { setEditTask(undefined); setFormOpen(true); }
   function openEdit(task: Task) { setEditTask(task); setFormOpen(true); }
@@ -45,10 +42,9 @@ export default function TasksPage() {
 
   const filtered = useMemo(() => {
     return all
-      .filter((tk) => (filter === "all" ? true : tk.priority === filter))
       .filter((tk) => (search ? tk.title.toLowerCase().includes(search.toLowerCase()) : true))
-      .sort((a, b) => PRIORITY[a.priority].rank - PRIORITY[b.priority].rank || (a.date ?? "~").localeCompare(b.date ?? "~"));
-  }, [all, filter, search]);
+      .sort((a, b) => (a.date ?? "~").localeCompare(b.date ?? "~") || a.title.localeCompare(b.title));
+  }, [all, search]);
 
   return (
     <PageContainer wide>
@@ -115,24 +111,9 @@ export default function TasksPage() {
         <TabsContent value="all" className="mt-4">
           <Card>
             <CardContent className="flex flex-col gap-3 pt-6">
-              <div className="flex flex-col gap-2 sm:flex-row">
-                <div className="relative flex-1">
-                  <Search className="absolute left-2.5 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
-                  <Input value={search} onChange={(e) => setSearch(e.target.value)} placeholder={t("tasks.search")} className="pl-8" />
-                </div>
-                <div className="flex gap-1.5">
-                  {(["all", "high", "medium", "low"] as const).map((f) => (
-                    <Button
-                      key={f}
-                      size="sm"
-                      variant={filter === f ? "default" : "outline"}
-                      onClick={() => setFilter(f)}
-                      className={cn("capitalize", filter !== f && f !== "all" && PRIORITY[f as TaskPriority].text)}
-                    >
-                      {f === "all" ? t("tasks.all") : t(PRIORITY[f as TaskPriority].labelKey)}
-                    </Button>
-                  ))}
-                </div>
+              <div className="relative">
+                <Search className="absolute left-2.5 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+                <Input value={search} onChange={(e) => setSearch(e.target.value)} placeholder={t("tasks.search")} className="pl-8" />
               </div>
               <TaskList tasks={filtered} onEdit={openEdit} emptyText={t("tasks.emptyInbox")} reorderable={false} />
             </CardContent>
