@@ -196,6 +196,8 @@ export interface GameState extends OwnedRecord {
   streakShields: number; // consumable streak protections
   /** Day the lives system was last reconciled, so we only evaluate each day once. */
   lastEvaluatedDay?: DayKey;
+  /** When the user last reset their progress; XP/achievements only count activity on/after this. */
+  gamificationResetAt?: ISODate;
 }
 
 /** Append-only ledger. Positive = earned, negative = spent. */

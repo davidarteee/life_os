@@ -183,6 +183,9 @@ export const es: Partial<Record<DictKey, string>> = {
   "testing.loseAll": "Perder todas las vidas",
   "testing.restore": "Restaurar vidas",
   "testing.plus100": "+100 XP",
+  "testing.reset": "Reiniciar progreso",
+  "testing.resetConfirm": "¿Reiniciar tu progreso? XP → 0, nivel → 1, vidas al máximo, y se borran el historial de XP y los logros. Se conservan tus hábitos, tareas y eventos.",
+  "testing.resetDone": "Progreso reiniciado",
 
   "dashboard.title": "Panel",
   "dashboard.customize": "Personalizar",

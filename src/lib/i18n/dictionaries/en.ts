@@ -191,6 +191,9 @@ export const en = {
   "testing.loseAll": "Lose all lives",
   "testing.restore": "Restore lives",
   "testing.plus100": "+100 XP",
+  "testing.reset": "Reset progress",
+  "testing.resetConfirm": "Reset your progress? XP → 0, level → 1, lives refilled, and the XP history and achievements are cleared. Your habits, tasks and events are kept.",
+  "testing.resetDone": "Progress reset",
 
   /* ------------------------------------------------------- dashboard ----- */
   "dashboard.title": "Dashboard",

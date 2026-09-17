@@ -2,15 +2,14 @@
 
 import { useMemo, useState } from "react";
 import { ChevronLeft, ChevronRight, Plus } from "lucide-react";
-import { monthGrid, groupByDay, type CalendarItem } from "@/lib/calendar/calendar";
+import { monthGrid, groupByDay } from "@/lib/calendar/calendar";
 import { useCalendarItems, useTasksForDay } from "@/hooks/use-tasks";
 import { useEventsForDay } from "@/hooks/use-events";
 import { TaskList } from "@/components/tasks/task-list";
 import { TaskForm } from "@/components/tasks/task-form";
 import { EventList } from "@/components/events/event-list";
 import { EventForm } from "@/components/events/event-form";
-import { PRIORITY } from "@/components/tasks/priority";
-import { ACCENT } from "@/lib/domain-colors";
+import { CalendarChip } from "@/components/calendar/calendar-chip";
 import { dayKey, fromDayKey, WEEKDAY_KEYS } from "@/lib/date";
 import { useT } from "@/hooks/use-t";
 import { useLocaleStore } from "@/stores/locale-store";
@@ -18,10 +17,6 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import type { Task, Event as EventType } from "@/lib/types";
 import { cn } from "@/lib/utils";
-
-function itemDot(item: CalendarItem): string {
-  return item.priority ? PRIORITY[item.priority].dot : ACCENT[item.accent].dot;
-}
 
 export function MonthCalendar() {
   const { t } = useT();
@@ -69,7 +64,7 @@ export function MonthCalendar() {
                 key={cell.key}
                 onClick={() => setSelected(cell.key)}
                 className={cn(
-                  "flex min-h-14 flex-col items-stretch gap-0.5 rounded-lg border p-1 text-left transition-colors md:min-h-24",
+                  "flex min-h-20 flex-col items-stretch gap-0.5 rounded-lg border p-1 text-left transition-colors md:min-h-28",
                   cell.inMonth ? "bg-card" : "bg-muted/30 text-muted-foreground/50",
                   isSel ? "border-primary ring-1 ring-primary/40" : "border-border/50 hover:border-border",
                 )}
@@ -80,22 +75,11 @@ export function MonthCalendar() {
                 )}>
                   {cell.date.getDate()}
                 </span>
-                {/* Desktop chips */}
-                <div className="hidden flex-col gap-0.5 md:flex">
-                  {dayItems.slice(0, 3).map((it) => (
-                    <div key={it.id} className="flex items-center gap-1 truncate rounded bg-muted/60 px-1 py-0.5 text-[10px]">
-                      <span className={cn("size-1.5 shrink-0 rounded-full", !it.color && itemDot(it))} style={it.color ? { background: it.color } : undefined} />
-                      <span className={cn("truncate", it.done && "text-muted-foreground line-through")}>{it.title}</span>
-                    </div>
-                  ))}
-                  {dayItems.length > 3 && <span className="px-1 text-[9px] text-muted-foreground">{t("calendar.more", { n: dayItems.length - 3 })}</span>}
+                {/* Colored chips (desktop + mobile) */}
+                <div className="flex flex-col gap-0.5">
+                  {dayItems.slice(0, 3).map((it) => <CalendarChip key={it.id} item={it} />)}
+                  {dayItems.length > 3 && <span className="px-0.5 text-[9px] text-muted-foreground">{t("calendar.more", { n: dayItems.length - 3 })}</span>}
                 </div>
-                {/* Mobile dots */}
-                {dayItems.length > 0 && (
-                  <div className="mt-auto flex flex-wrap gap-0.5 md:hidden">
-                    {dayItems.slice(0, 4).map((it) => <span key={it.id} className={cn("size-1.5 rounded-full", !it.color && itemDot(it))} style={it.color ? { background: it.color } : undefined} />)}
-                  </div>
-                )}
               </button>
             );
           })}

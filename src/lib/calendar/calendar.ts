@@ -38,6 +38,23 @@ export async function collectCalendarItems(userId: string): Promise<CalendarItem
   return groups.flat();
 }
 
+/**
+ * Resolve a calendar item's display color to a CSS color string: explicit
+ * `color` (events, by category) first, then a per-priority color (tasks), then
+ * the domain accent token. Used for the colored chips in every calendar view.
+ */
+export function calendarItemColor(item: CalendarItem): string {
+  if (item.color) return item.color;
+  if (item.priority) {
+    return item.priority === "high"
+      ? "var(--destructive)"
+      : item.priority === "medium"
+        ? "oklch(0.76 0.15 85)"
+        : "oklch(0.64 0.04 260)";
+  }
+  return `var(--${item.accent === "neutral" ? "primary" : item.accent})`;
+}
+
 /** Group a flat list of items by day key for quick lookup in the grid. */
 export function groupByDay(items: CalendarItem[]): Map<DayKey, CalendarItem[]> {
   const map = new Map<DayKey, CalendarItem[]>();

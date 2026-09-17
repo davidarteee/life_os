@@ -59,6 +59,32 @@ export async function getGameState(userId: string): Promise<GameState> {
   return upsert(gs(userId), created);
 }
 
+/**
+ * Reset the user's gamification: zero XP/level, refill lives, clear the XP
+ * ledger and all achievements, and stamp a reset cutoff so past habit/task
+ * history doesn't retroactively re-unlock achievements or re-award XP. Habits,
+ * tasks and other data are untouched — only progression is reset.
+ */
+export async function resetGamification(userId: string, config: GameConfig): Promise<void> {
+  const now = new Date().toISOString();
+  const events = await db().xpEvents.where("user_id").equals(userId).toArray();
+  for (const e of events) await softDelete(xp(userId), e.id);
+  const achievements = await db().userAchievements.where("user_id").equals(userId).toArray();
+  for (const a of achievements) await softDelete(ua(userId), a.id);
+
+  const state = await getGameState(userId);
+  await upsert(gs(userId), {
+    ...state,
+    xp: 0,
+    spendableXp: 0,
+    level: 1,
+    lives: config.lives.maxLives,
+    streakShields: 0,
+    lastEvaluatedDay: dayKey(),
+    gamificationResetAt: now,
+  });
+}
+
 export interface XpResult {
   state: GameState;
   leveledUp: boolean;
@@ -311,10 +337,16 @@ export async function verifyChallenge(
 export async function computeCounters(userId: string): Promise<AchievementCounters> {
   const habits = await listHabits(userId, true);
   const requiredIds = new Set(habits.filter((h) => h.required).map((h) => h.id));
-  const logs = await allLogs(userId);
   const state = await getGameState(userId);
   const challenges = await listChallenges(userId);
   const freeDays = await listFreeDays(userId);
+
+  // After a progress reset, only count activity created on/after the reset so
+  // past history doesn't retroactively re-unlock achievements and re-award XP.
+  const resetAt = state.gamificationResetAt ?? "";
+  const afterReset = (created: string) => !resetAt || created >= resetAt;
+
+  const logs = (await allLogs(userId)).filter((l) => afterReset(l.created_at));
 
   const habitsCompleted = logs.filter((l) => l.completed).length;
 
@@ -344,11 +376,12 @@ export async function computeCounters(userId: string): Promise<AchievementCounte
   }
 
   const tasksCompleted = activeRecords(await db().tasks.where("user_id").equals(userId).toArray()).filter(
-    (t) => t.status === "done",
+    (t) => t.status === "done" && afterReset(t.completedAt ?? ""),
   ).length;
 
   // Nutrition: distinct days with any logged food, and days that met the targets.
-  const foodEntries = activeRecords(await db().foodEntries.where("user_id").equals(userId).toArray());
+  const foodEntries = activeRecords(await db().foodEntries.where("user_id").equals(userId).toArray())
+    .filter((e) => afterReset(e.created_at));
   const entriesByDay = new Map<string, Macros[]>();
   for (const e of foodEntries) {
     if (!entriesByDay.has(e.day)) entriesByDay.set(e.day, []);
@@ -369,9 +402,9 @@ export async function computeCounters(userId: string): Promise<AchievementCounte
     nutritionDaysLogged,
     nutritionTargetsHit,
     level: state.level,
-    challengesVerified: challenges.filter((c) => c.status === "verified").length,
+    challengesVerified: challenges.filter((c) => c.status === "verified" && afterReset(c.created_at)).length,
     xpTotal: state.xp,
-    freeDaysUsed: freeDays.length,
+    freeDaysUsed: freeDays.filter((f) => afterReset(f.created_at)).length,
   };
 }
 

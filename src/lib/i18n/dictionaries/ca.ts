@@ -183,6 +183,9 @@ export const ca: Partial<Record<DictKey, string>> = {
   "testing.loseAll": "Perd totes les vides",
   "testing.restore": "Restaura vides",
   "testing.plus100": "+100 XP",
+  "testing.reset": "Reinicia el progrés",
+  "testing.resetConfirm": "Reiniciar el teu progrés? XP → 0, nivell → 1, vides al màxim, i s'esborren l'historial d'XP i els assoliments. Es conserven els teus hàbits, tasques i esdeveniments.",
+  "testing.resetDone": "Progrés reiniciat",
 
   "dashboard.title": "Tauler",
   "dashboard.customize": "Personalitza",

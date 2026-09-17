@@ -4,7 +4,7 @@ import { FlaskConical, ChevronDown } from "lucide-react";
 import { useState } from "react";
 import { useSession } from "@/components/providers/session-provider";
 import { useGameState, useGameConfig } from "@/hooks/use-game";
-import { setLives, awardXp } from "@/lib/data/game";
+import { setLives, awardXp, resetGamification } from "@/lib/data/game";
 import { XP_REASON } from "@/lib/game/config";
 import { Button } from "@/components/ui/button";
 import { useT } from "@/hooks/use-t";
@@ -45,6 +45,18 @@ export function TestingTools() {
           </Button>
           <Button size="sm" variant="outline" onClick={() => { awardXp(user.id, 100, XP_REASON.levelAdjust); toast.success(t("testing.plus100")); }}>
             {t("testing.plus100")}
+          </Button>
+          <Button
+            size="sm"
+            variant="outline"
+            className="text-destructive hover:text-destructive"
+            onClick={async () => {
+              if (!window.confirm(t("testing.resetConfirm"))) return;
+              await resetGamification(user.id, config);
+              toast.success(t("testing.resetDone"));
+            }}
+          >
+            {t("testing.reset")}
           </Button>
         </div>
       )}

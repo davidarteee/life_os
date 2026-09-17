@@ -3,10 +3,9 @@
 import { useMemo, useState } from "react";
 import Link from "next/link";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import { groupByDay, type CalendarItem } from "@/lib/calendar/calendar";
+import { groupByDay } from "@/lib/calendar/calendar";
 import { useCalendarItems } from "@/hooks/use-tasks";
-import { PRIORITY } from "@/components/tasks/priority";
-import { ACCENT } from "@/lib/domain-colors";
+import { CalendarChip } from "@/components/calendar/calendar-chip";
 import { dayKey, fromDayKey, shiftDayKey, weekdayIndex, WEEKDAY_KEYS } from "@/lib/date";
 import { useT } from "@/hooks/use-t";
 import { useLocaleStore } from "@/stores/locale-store";
@@ -17,10 +16,6 @@ import { cn } from "@/lib/utils";
 /** Monday of the week containing `key`. */
 function weekStartKey(key: string): string {
   return shiftDayKey(key, -weekdayIndex(fromDayKey(key)));
-}
-
-function dotClass(item: CalendarItem): string {
-  return item.priority ? PRIORITY[item.priority].dot : ACCENT[item.accent].dot;
 }
 
 /** A week agenda (Mon–Sun): each day lists its tasks + events, navigable. */
@@ -65,13 +60,8 @@ export function WeekCalendar() {
                   <span className="px-1 py-2 text-center text-[10px] text-muted-foreground/40 sm:py-3">—</span>
                 ) : (
                   dayItems.map((it) => (
-                    <Link
-                      key={it.id}
-                      href={it.href}
-                      className="flex items-center gap-1 truncate rounded bg-muted/60 px-1 py-0.5 text-[10px] transition-colors hover:bg-muted"
-                    >
-                      <span className={cn("size-1.5 shrink-0 rounded-full", !it.color && dotClass(it))} style={it.color ? { background: it.color } : undefined} />
-                      <span className={cn("truncate", it.done && "text-muted-foreground line-through")}>{it.title}</span>
+                    <Link key={it.id} href={it.href} className="block transition-opacity hover:opacity-80">
+                      <CalendarChip item={it} />
                     </Link>
                   ))
                 )}

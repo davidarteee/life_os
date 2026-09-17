@@ -5,14 +5,14 @@
  * later ones feel earned, without ever becoming impossible. Cost to go from
  * level L to L+1 is: BASE * L^EXP, rounded to a tidy step.
  *
- *   L1→L2 ≈ 100 XP,  L4→L5 ≈ 340,  L9→L10 ≈ 900,  L24→L25 ≈ 3100
+ *   L1→L2 ≈ 200 XP,  L4→L5 ≈ 1600,  L9→L10 ≈ 5400,  L24→L25 ≈ 23520
  *
  * All functions are pure and unit-tested — they are the backbone of the whole
  * progression system, so correctness matters more than cleverness.
  */
 
-const BASE = 100;
-const EXP = 1.45;
+const BASE = 200;
+const EXP = 1.5;
 
 /** XP required to advance FROM the given level to the next one. */
 export function xpToNextLevel(level: number): number {
