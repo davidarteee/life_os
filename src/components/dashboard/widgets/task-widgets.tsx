@@ -3,7 +3,7 @@
 import { useMemo, useState } from "react";
 import Link from "next/link";
 import { ArrowRight, Inbox, CalendarDays } from "lucide-react";
-import { useToday, useInbox, useTaskStats, useCalendarItems } from "@/hooks/use-tasks";
+import { useToday, useAllTasks, useCalendarItems } from "@/hooks/use-tasks";
 import { TaskItem } from "@/components/tasks/task-item";
 import { TaskForm } from "@/components/tasks/task-form";
 import { monthGrid, groupByDay } from "@/lib/calendar/calendar";
@@ -40,36 +40,36 @@ export function TodayTasksWidget() {
   );
 }
 
-/** Pending / inbox summary with the top backlog items. */
-export function TaskInboxWidget() {
-  const stats = useTaskStats();
-  const inbox = useInbox();
+/** The full pending task list (as many as fit; scrolls). Height is resizable. */
+export function TaskListWidget() {
+  const all = useAllTasks();
   const { t } = useT();
   const [editTask, setEditTask] = useState<Task | undefined>();
   const [open, setOpen] = useState(false);
 
+  // All to-do tasks: dated ones first (soonest), then undated backlog.
+  const pending = useMemo(
+    () => all
+      .filter((tk) => tk.status === "todo")
+      .sort((a, b) => (a.date ?? "~").localeCompare(b.date ?? "~") || a.order - b.order),
+    [all],
+  );
+
   return (
-    <div className="flex h-full flex-col gap-3">
-      <div className="grid grid-cols-3 gap-2 text-center">
-        {[
-          { label: t("tasks.pending"), value: stats.pending, cls: "text-primary" },
-          { label: t("tasks.overdue"), value: stats.overdue, cls: "text-destructive" },
-          { label: t("tasks.inbox"), value: stats.inbox, cls: "text-muted-foreground" },
-        ].map((s) => (
-          <div key={s.label} className="rounded-lg border border-border/60 bg-card/60 py-2">
-            <p className={cn("font-heading text-lg font-bold tabular-nums", s.cls)}>{s.value}</p>
-            <p className="text-[10px] text-muted-foreground">{s.label}</p>
+    <div className="flex h-full flex-col">
+      <div className="min-h-0 flex-1 overflow-y-auto">
+        {pending.length === 0 ? (
+          <p className="grid h-full place-items-center text-center text-sm text-muted-foreground">{t("tasks.emptyInbox")}</p>
+        ) : (
+          <div className="flex flex-col gap-1.5 pr-0.5">
+            {pending.map((task) => (
+              <TaskItem key={task.id} task={task} onEdit={() => { setEditTask(task); setOpen(true); }} />
+            ))}
           </div>
-        ))}
+        )}
       </div>
-      <div className="flex flex-col gap-1.5">
-        {inbox.slice(0, 3).map((task) => (
-          <TaskItem key={task.id} task={task} onEdit={() => { setEditTask(task); setOpen(true); }} showDate={false} />
-        ))}
-        {inbox.length === 0 && <p className="text-center text-xs text-muted-foreground">{t("tasks.emptyInbox")}</p>}
-      </div>
-      <Link href="/tasks" className="mt-auto inline-flex items-center gap-1 pt-1 text-xs text-muted-foreground hover:text-foreground">
-        <Inbox className="size-3" /> {t("tasks.inbox")} <ArrowRight className="size-3" />
+      <Link href="/tasks" className="mt-2 inline-flex items-center gap-1 pt-1 text-xs text-muted-foreground hover:text-foreground">
+        <Inbox className="size-3" /> {t("nav.tasks")} <ArrowRight className="size-3" />
       </Link>
       <TaskForm open={open} onOpenChange={setOpen} task={editTask} />
     </div>

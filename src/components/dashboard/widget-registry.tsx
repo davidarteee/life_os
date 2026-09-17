@@ -12,7 +12,7 @@ import { PomodoroWidget } from "@/components/dashboard/widgets/pomodoro";
 import { MonthOverviewWidget } from "@/components/dashboard/widgets/month-overview";
 import { WeekOverviewWidget } from "@/components/dashboard/widgets/week-overview";
 import { StreaksWidget, LivesWidget, ComingSoonMini } from "@/components/dashboard/widgets/small-widgets";
-import { TodayTasksWidget, TaskInboxWidget, MiniCalendarWidget } from "@/components/dashboard/widgets/task-widgets";
+import { TodayTasksWidget, TaskListWidget, MiniCalendarWidget } from "@/components/dashboard/widgets/task-widgets";
 import { TodayEventsWidget } from "@/components/dashboard/widgets/events-widget";
 import { NutritionSummaryWidget, ExerciseSummaryWidget } from "@/components/dashboard/widgets/health-widgets";
 import { useT } from "@/hooks/use-t";
@@ -34,7 +34,7 @@ export function WidgetContent({ id }: { id: WidgetId }) {
     case "today-events":
       return <TodayEventsWidget />;
     case "task-inbox":
-      return <TaskInboxWidget />;
+      return <TaskListWidget />;
     case "calendar":
       return <MiniCalendarWidget />;
     case "gamification":

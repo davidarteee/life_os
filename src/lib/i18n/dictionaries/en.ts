@@ -215,7 +215,7 @@ export const en = {
   "widget.coming-soon-health": "Health",
   "widget.coming-soon-finance": "Finance",
   "widget.today-tasks": "Today's tasks",
-  "widget.task-inbox": "Inbox",
+  "widget.task-inbox": "Task list",
   "widget.calendar": "Calendar",
 
   "widgets.streaksEmpty": "Complete habits to build streaks 🔥",

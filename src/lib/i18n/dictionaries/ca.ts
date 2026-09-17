@@ -206,7 +206,7 @@ export const ca: Partial<Record<DictKey, string>> = {
   "widget.coming-soon-health": "Salut",
   "widget.coming-soon-finance": "Finances",
   "widget.today-tasks": "Tasques d'avui",
-  "widget.task-inbox": "Safata d'entrada",
+  "widget.task-inbox": "Llista de tasques",
   "widget.calendar": "Calendari",
 
   "widgets.streaksEmpty": "Completa hàbits per crear ratxes 🔥",
