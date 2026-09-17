@@ -26,11 +26,20 @@ export const DEFAULT_CATEGORIES: { slug: string; color: string; icon: string; la
   { slug: "otros", color: "oklch(0.62 0.03 260)", icon: "CalendarClock", labelKey: "events.cat.otros" },
 ];
 
-/** Palette + icon options offered in the category editor. */
+/** Palette offered in the category editor (spread around the hue wheel). */
 export const CATEGORY_COLORS = [
-  "oklch(0.65 0.17 255)", "oklch(0.68 0.16 150)", "oklch(0.66 0.19 35)", "oklch(0.62 0.19 300)",
-  "oklch(0.70 0.19 350)", "oklch(0.72 0.13 195)", "oklch(0.77 0.15 85)", "oklch(0.70 0.16 130)",
-  "oklch(0.68 0.14 220)", "oklch(0.62 0.18 285)", "oklch(0.66 0.20 20)", "oklch(0.62 0.03 260)",
+  // reds / oranges / ambers
+  "oklch(0.62 0.21 25)", "oklch(0.66 0.20 40)", "oklch(0.72 0.18 55)", "oklch(0.77 0.15 85)",
+  // yellow-greens / greens
+  "oklch(0.80 0.16 105)", "oklch(0.72 0.18 130)", "oklch(0.68 0.16 150)", "oklch(0.70 0.14 168)",
+  // teals / cyans
+  "oklch(0.72 0.13 190)", "oklch(0.70 0.13 205)", "oklch(0.68 0.14 220)",
+  // blues / indigos
+  "oklch(0.64 0.17 240)", "oklch(0.62 0.19 262)", "oklch(0.58 0.18 278)",
+  // violets / magentas / pinks
+  "oklch(0.62 0.20 300)", "oklch(0.66 0.21 325)", "oklch(0.70 0.19 350)", "oklch(0.72 0.16 5)",
+  // browns / neutrals
+  "oklch(0.55 0.08 60)", "oklch(0.72 0.03 260)", "oklch(0.62 0.03 260)", "oklch(0.48 0.02 260)",
 ];
 
 /** The fallback category id (legacy/uncategorized items resolve here). */
